@@ -247,7 +247,7 @@ class ProjectDetail extends Page
 
         $who = $b($entry->causer?->name ?? 'Sistema');
         $subject = $entry->subject;
-        $attributes = $entry->properties['attributes'] ?? [];
+        $attributes = $entry->attribute_changes?->get('attributes') ?? [];
         $name = match (class_basename($entry->subject_type)) {
             'ProjectRequirement' => 'il requisito '.$b('«'.($subject?->label ?? '').'»'),
             'Material' => 'il materiale '.$b($subject?->kind?->label() ?? ''),

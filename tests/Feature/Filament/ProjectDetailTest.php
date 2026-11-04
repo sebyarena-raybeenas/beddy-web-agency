@@ -250,3 +250,15 @@ it('lists the status change in the activity timeline', function () {
 
     detail($project)->call('changeStatus', 'in_sviluppo')->assertSee('Sara Admin')->assertSee('ha cambiato lo stato in');
 });
+
+it('words the timeline for a completed task and a received material in Italian', function () {
+    $project = Project::factory()->create();
+    $task = Task::factory()->create(['project_id' => $project->id, 'title' => 'Home page']);
+    $material = Material::create(['project_id' => $project->id, 'kind' => MaterialKind::Foto, 'status' => 'atteso']);
+
+    detail($project)
+        ->call('toggleTask', $task->id)
+        ->assertSeeHtml('<b>Sara Admin</b> ha completato il to-do <b>«Home page»</b>')
+        ->call('setMaterialStatus', $material->id, 'ricevuto')
+        ->assertSeeHtml('<b>Sara Admin</b> ha segnato «Ricevuto» il materiale <b>Foto</b>');
+});
