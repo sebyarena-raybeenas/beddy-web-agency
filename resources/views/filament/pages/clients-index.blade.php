@@ -17,7 +17,7 @@
             @forelse ($clients as $client)
                 @php
                     $byStatus = $client->projects->groupBy(fn ($p) => $p->statusLabel())->map->count();
-                    $domains = $client->projects->flatMap->domains->pluck('name')->unique();
+                    $domains = $client->domains->pluck('name')->unique();
                     $contact = $client->contacts->first();
                 @endphp
                 <div class="pb-card cl-cc" wire:key="client-{{ $client->id }}">

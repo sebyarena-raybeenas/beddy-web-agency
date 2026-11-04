@@ -46,17 +46,21 @@ class ClientsIndex extends Page
         return Client::query()
             ->when($term !== '', function (Builder $q) use ($term) {
                 $like = '%'.$term.'%';
-                $domain = '%'.Domain::normalizeName($term).'%';
-                $q->where(fn (Builder $w) => $w
-                    ->where('name', 'like', $like)
-                    ->orWhereHas('domains', fn (Builder $d) => $d->where('name', 'like', $domain))
-                    ->orWhereHas('projects.domains', fn (Builder $d) => $d->where('name', 'like', $domain)));
+                $normalized = Domain::normalizeName($term);
+                $q->where(function (Builder $w) use ($like, $normalized) {
+                    $w->where('name', 'like', $like);
+                    if ($normalized !== '') {
+                        $domain = '%'.$normalized.'%';
+                        $w->orWhereHas('domains', fn (Builder $d) => $d->where('name', 'like', $domain))
+                            ->orWhereHas('projects.domains', fn (Builder $d) => $d->where('name', 'like', $domain));
+                    }
+                });
             })
             ->withCount(['projects as active_projects_count' => fn (Builder $p) => $p->notFinal()])
             ->with([
                 'contacts' => fn ($c) => $c->where('is_primary', true),
                 'projects:id,client_id,type,status',
-                'projects.domains' => fn ($d) => $d->where('role', 'principale'),
+                'domains' => fn ($d) => $d->where('role', 'principale'),
             ])
             ->orderBy('name')
             ->get();

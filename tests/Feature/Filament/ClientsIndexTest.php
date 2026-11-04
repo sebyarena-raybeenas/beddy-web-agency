@@ -65,3 +65,18 @@ it('shows active projects count, per-status counts and primary domains', functio
     $row = $component->instance()->clients()->first();
     expect($row->active_projects_count)->toBe(2);
 });
+
+it('shows a client-level primary domain without a project', function () {
+    $client = Client::factory()->create(['name' => 'Hotel Rossi']);
+    Domain::create(['client_id' => $client->id, 'project_id' => null, 'name' => 'solo-cliente.it', 'role' => DomainRole::Principale]);
+    Domain::create(['client_id' => $client->id, 'project_id' => null, 'name' => 'altro.it', 'role' => DomainRole::Secondario]);
+
+    Livewire::test(ClientsIndex::class)->assertSee('solo-cliente.it')->assertDontSee('altro.it');
+});
+
+it('ignores the domain match when the normalized search is empty', function () {
+    $client = Client::factory()->create(['name' => 'Hotel Rossi']);
+    Domain::create(['client_id' => $client->id, 'name' => 'rossi.it', 'role' => DomainRole::Principale]);
+
+    Livewire::test(ClientsIndex::class)->set('search', '/')->assertDontSee('Hotel Rossi');
+});
