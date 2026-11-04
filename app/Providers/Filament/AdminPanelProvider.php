@@ -30,6 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->brandName('Beddy Web Agency')
             ->login()
+            ->passwordReset()
             ->font('Plus Jakarta Sans')
             ->databaseNotifications()
             ->sidebarCollapsibleOnDesktop()
