@@ -5,12 +5,14 @@ namespace App\Models;
 use App\Domain\Workflow\InvalidTransition;
 use App\Domain\Workflow\Workflow;
 use App\Domain\Workflow\WorkflowRegistry;
+use App\Enums\MaterialStatus;
 use App\Enums\Origin;
 use App\Enums\ProjectType;
 use App\Filament\Resources\Projects\ProjectResource;
 use App\Models\Concerns\LogsModelActivity;
 use Database\Factories\ProjectFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -135,6 +137,37 @@ class Project extends Model
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
+    }
+
+    /** Not in a final state of its flow. */
+    public function scopeNotFinal(Builder $query): void
+    {
+        $registry = app(WorkflowRegistry::class);
+
+        foreach (['sito', 'modifica'] as $flow) {
+            $workflow = $registry->get($flow);
+            $finals = array_values(array_filter(array_keys($workflow->states()), fn ($s) => $workflow->isFinal($s)));
+            $types = collect(ProjectType::cases())->filter(fn ($t) => $t->flow() === $flow)->all();
+
+            $query->whereNot(fn (Builder $q) => $q->whereIn('type', $types)->whereIn('status', $finals));
+        }
+    }
+
+    /** Due within the next 7 days (or already past) and not finished. */
+    public function scopeDueSoon(Builder $query): void
+    {
+        $query->notFinal()->whereNotNull('due_date')->whereDate('due_date', '<=', today()->addDays(7));
+    }
+
+    /** Has a material still awaited and requested more than 7 days ago (same rule as the daily reminders). */
+    public function scopeMaterialOverdue(Builder $query): void
+    {
+        $threshold = today()->subDays(7)->endOfDay();
+
+        $query->whereHas('materials', fn (Builder $m) => $m
+            ->where('status', MaterialStatus::Atteso->value)
+            ->whereNotNull('requested_at')
+            ->where('requested_at', '<=', $threshold));
     }
 
     protected function activityLogExcept(): array

@@ -29,6 +29,8 @@ class ClientResource extends Resource
 
     protected static ?string $navigationLabel = 'Clienti';
 
+    protected static ?int $navigationSort = 3;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;

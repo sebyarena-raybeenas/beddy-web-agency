@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Domain\Workflow\WorkflowRegistry;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,6 +21,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Blade::anonymousComponentPath(resource_path('views/filament/components'), 'beddy');
     }
 }

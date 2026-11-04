@@ -30,7 +30,9 @@ class ProjectResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Progetti';
 
-    protected static ?string $navigationLabel = 'Progetti';
+    protected static ?string $navigationLabel = 'Elenco progetti';
+
+    protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'name';
 
