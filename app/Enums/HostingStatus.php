@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum HostingStatus: string
+use Filament\Support\Contracts\HasLabel;
+
+enum HostingStatus: string implements HasLabel
 {
     case Suo = 'suo';
     case Nostro = 'nostro';
@@ -15,5 +17,10 @@ enum HostingStatus: string
             self::Nostro => 'Nostro',
             self::DaAttivare => 'Da attivare',
         };
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label();
     }
 }

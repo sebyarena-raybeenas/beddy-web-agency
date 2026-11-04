@@ -7,6 +7,7 @@ use App\Domain\Workflow\Workflow;
 use App\Domain\Workflow\WorkflowRegistry;
 use App\Enums\Origin;
 use App\Enums\ProjectType;
+use App\Filament\Resources\Projects\ProjectResource;
 use App\Models\Concerns\LogsModelActivity;
 use Database\Factories\ProjectFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -73,7 +74,7 @@ class Project extends Model
 
     public function detailUrl(): string
     {
-        return url('/progetti/'.$this->id);
+        return ProjectResource::getUrl('view', ['record' => $this]);
     }
 
     public function statusLabel(): string

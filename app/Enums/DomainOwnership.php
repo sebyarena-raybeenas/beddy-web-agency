@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum DomainOwnership: string
+use Filament\Support\Contracts\HasLabel;
+
+enum DomainOwnership: string implements HasLabel
 {
     case Suo = 'suo';
     case Nostro = 'nostro';
@@ -15,5 +17,10 @@ enum DomainOwnership: string
             self::Nostro => 'Nostro',
             self::DaAcquistare => 'Da acquistare',
         };
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label();
     }
 }

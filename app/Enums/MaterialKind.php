@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum MaterialKind: string
+use Filament\Support\Contracts\HasLabel;
+
+enum MaterialKind: string implements HasLabel
 {
     case Foto = 'foto';
     case Testi = 'testi';
@@ -17,5 +19,10 @@ enum MaterialKind: string
             self::Logo => 'Logo',
             self::Altro => 'Altro',
         };
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label();
     }
 }

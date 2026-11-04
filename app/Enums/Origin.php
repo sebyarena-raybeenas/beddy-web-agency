@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum Origin: string
+use Filament\Support\Contracts\HasLabel;
+
+enum Origin: string implements HasLabel
 {
     case Asana = 'asana';
     case Manuale = 'manuale';
@@ -13,5 +15,10 @@ enum Origin: string
             self::Asana => 'Asana',
             self::Manuale => 'Manuale',
         };
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label();
     }
 }

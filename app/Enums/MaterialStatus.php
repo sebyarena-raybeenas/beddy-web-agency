@@ -2,7 +2,9 @@
 
 namespace App\Enums;
 
-enum MaterialStatus: string
+use Filament\Support\Contracts\HasLabel;
+
+enum MaterialStatus: string implements HasLabel
 {
     case Atteso = 'atteso';
     case Ricevuto = 'ricevuto';
@@ -21,5 +23,10 @@ enum MaterialStatus: string
     public function isResolved(): bool
     {
         return $this !== self::Atteso;
+    }
+
+    public function getLabel(): string
+    {
+        return $this->label();
     }
 }
