@@ -231,7 +231,8 @@ class ProjectsBoard extends Page
         }
 
         return $query
-            ->with(['client', 'owner', 'requirements', 'materials'])
+            ->with(['client', 'owner', 'requirements', 'materials', 'primaryDomain'])
+            ->withCount(['tasks', 'tasks as tasks_done_count' => fn (Builder $t) => $t->whereNotNull('completed_at')])
             ->orderByRaw('due_date is null')
             ->orderBy('due_date')
             ->orderBy('name')

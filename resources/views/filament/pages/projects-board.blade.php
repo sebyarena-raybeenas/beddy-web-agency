@@ -76,16 +76,19 @@
         @elseif ($viewMode === 'list')
             <div class="pb-card" style="overflow-x:auto">
                 <table class="pb-table">
-                    <tr><th>Cliente / progetto</th><th>Tipo</th><th>Stato</th><th>Requisiti</th><th>Responsabile</th><th>Scadenza</th></tr>
+                    <tr><th>Cliente / progetto</th><th>Tipo</th><th>Stato</th><th>Requisiti</th><th>To-do</th><th>Responsabile</th><th>Scadenza</th><th>Avvisi</th></tr>
                     @forelse ($projects as $p)
                         @php
-                            $overdue = ! $p->workflow()->isFinal($p->status) && $p->due_date && $p->due_date->isBefore(today());
+                            $overdue = $p->isOverdue();
+                            $late = $p->hasLateMaterial();
+                            $pct = $p->tasks_count > 0 ? (int) round($p->tasks_done_count / $p->tasks_count * 100) : 0;
                         @endphp
                         <tr class="pb-tr">
                             <td><a href="{{ $p->detailUrl() }}"><b>{{ $p->client->name }}</b><div class="pb-sub">{{ $p->name }}</div></a></td>
                             <td>{{ $p->type->label() }}</td>
                             <td><span class="pb-pill {{ ProjectsBoard::pill($p->status) }}">{{ $p->statusLabel() }}</span></td>
                             <td style="min-width:120px"><x-beddy::requirement-ticks :project="$p" /></td>
+                            <td><div class="pb-prog" style="width:90px" title="{{ $p->tasks_done_count }}/{{ $p->tasks_count }} to-do"><i style="width:{{ $pct }}%"></i></div></td>
                             <td>
                                 @if ($p->owner)
                                     <span class="pb-owner"><x-beddy::avatar :user="$p->owner" /> {{ $p->owner->name }}</span>
@@ -94,9 +97,10 @@
                                 @endif
                             </td>
                             <td @class(['pb-warn' => $overdue])>{{ $p->due_date?->format('d/m/Y') ?? '—' }}</td>
+                            <td>@if ($late)<span class="pb-warn">materiale in ritardo</span>@else — @endif</td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="pb-empty">Nessun progetto trovato.</td></tr>
+                        <tr><td colspan="8" class="pb-empty">Nessun progetto trovato.</td></tr>
                     @endforelse
                 </table>
             </div>

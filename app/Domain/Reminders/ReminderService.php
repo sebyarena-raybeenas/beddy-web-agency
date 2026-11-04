@@ -2,7 +2,6 @@
 
 namespace App\Domain\Reminders;
 
-use App\Enums\MaterialStatus;
 use App\Models\Project;
 use App\Notifications\DeadlineReminder;
 use App\Notifications\MaterialOverdueReminder;
@@ -42,13 +41,8 @@ class ReminderService
                     $sent += $this->send($project, new DeadlineReminder($project), $today);
                 }
 
-                $threshold = $today->subDays(7)->endOfDay();
-                $kinds = $project->materials
-                    ->filter(fn ($m) => $m->status === MaterialStatus::Atteso
-                        && $m->requested_at !== null
-                        && $m->requested_at->format('Y-m-d H:i:s') <= $threshold->format('Y-m-d H:i:s'))
+                $kinds = $project->lateMaterials($today)
                     ->map(fn ($m) => mb_strtolower($m->kind->label()))
-                    ->values()
                     ->all();
 
                 if ($kinds !== []) {

@@ -2,10 +2,13 @@
 
 use App\Filament\Pages\ProjectsBoard;
 use App\Models\Client;
+use App\Models\Domain;
 use App\Models\Material;
 use App\Models\Project;
 use App\Models\ProjectRequirement;
+use App\Models\Task;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -140,4 +143,33 @@ it('does not run N+1 queries on the grid', function () {
     DB::enableQueryLog();
     $test->call('$refresh');
     expect(count(DB::getQueryLog()))->toBeLessThan(20);
+});
+
+it('shows to-do progress and the primary domain on the card', function () {
+    $p = boardProject('Hotel Rossi', 'Sito Rossi');
+    $domain = Domain::factory()->create(['client_id' => $p->client_id, 'project_id' => $p->id, 'name' => 'hotelrossi.test']);
+    $p->update(['primary_domain_id' => $domain->id]);
+    Task::factory()->count(3)->create(['project_id' => $p->id, 'completed_at' => null]);
+    Task::factory()->create(['project_id' => $p->id, 'completed_at' => now()]);
+
+    Livewire::test(ProjectsBoard::class)
+        ->assertSee('1/4 to-do')
+        ->assertSee('hotelrossi.test')
+        ->assertSee('Manuale');
+});
+
+it('has a late-material helper that agrees with the scope at the boundary', function () {
+    $today = CarbonImmutable::parse('2026-11-17 10:00:00');
+    $mk = function (string $requestedAt) {
+        $p = boardProject('C'.$requestedAt, 'P'.$requestedAt);
+        Material::create(['project_id' => $p->id, 'kind' => 'foto', 'status' => 'atteso', 'requested_at' => $requestedAt]);
+
+        return $p;
+    };
+    $late = $mk('2026-11-10 23:59:59');
+    $notLate = $mk('2026-11-11 00:00:00');
+
+    expect($late->load('materials')->hasLateMaterial($today))->toBeTrue();
+    expect($notLate->load('materials')->hasLateMaterial($today))->toBeFalse();
+    expect(Project::materialOverdue($today)->pluck('id')->all())->toBe([$late->id]);
 });

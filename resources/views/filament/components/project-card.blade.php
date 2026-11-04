@@ -2,12 +2,12 @@
 @php
     use App\Filament\Pages\ProjectsBoard;
 
-    $workflow = $project->workflow();
-    $final = $workflow->isFinal($project->status);
-    $overdue = ! $final && $project->due_date && $project->due_date->isBefore(today());
-    $threshold = today()->subDays(7)->endOfDay();
-    $lateMaterial = $project->materials->contains(fn ($m) => $m->status === \App\Enums\MaterialStatus::Atteso && $m->requested_at && $m->requested_at->lte($threshold));
+    $overdue = $project->isOverdue();
+    $lateMaterial = $project->hasLateMaterial();
     $doneReqs = $project->requirements->where('is_done', true)->count();
+    $tasksTotal = $project->tasks_count ?? 0;
+    $tasksDone = $project->tasks_done_count ?? 0;
+    $pct = $tasksTotal > 0 ? (int) round($tasksDone / $tasksTotal * 100) : 0;
 @endphp
 <a href="{{ $project->detailUrl() }}" class="pb-card pb-pc">
     <div class="pb-hd">
@@ -23,6 +23,8 @@
             <span class="pb-warn">⚠ materiale in ritardo</span>
         @endif
     </div>
+    <div class="pb-mid" style="margin:4px 0 6px"><span>Avanzamento to-do</span><b style="color:var(--ink)">{{ $pct }}%</b></div>
+    <div class="pb-prog"><i style="width:{{ $pct }}%"></i></div>
     <x-beddy::requirement-ticks :project="$project" />
     <div class="pb-row">
         <div class="pb-owner">
@@ -33,6 +35,11 @@
                 <span class="pb-noowner">Nessun responsabile</span>
             @endif
         </div>
-        <div class="pb-meta"><span>✓ {{ $doneReqs }}/{{ $project->requirements->count() }} requisiti</span></div>
+        <div class="pb-meta"><span>☑ {{ $tasksDone }}/{{ $tasksTotal }} to-do</span><span>✓ {{ $doneReqs }}/{{ $project->requirements->count() }} requisiti</span></div>
+    </div>
+    <div class="pb-ft">
+        <div><span>Dominio / hosting</span><b>{{ $project->primaryDomain?->name ?? '—' }} · {{ $project->client->hosting_status?->label() ?? '—' }}</b></div>
+        <div><span>Origine</span><b><span class="pb-tag">{{ $project->origin->label() }}</span></b></div>
+        <div><span>Responsabile</span><b>{{ $project->owner?->name ?? 'Nessun responsabile' }}</b></div>
     </div>
 </a>

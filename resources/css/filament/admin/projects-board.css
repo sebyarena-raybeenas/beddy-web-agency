@@ -59,3 +59,9 @@
 .pb-sub { font-size: 12px; color: var(--mute); }
 .pb-empty { padding: 40px; text-align: center; color: var(--mute); grid-column: 1 / -1; }
 @media (max-width: 760px) { .pb-grid { grid-template-columns: 1fr; } }
+.pb-prog { height: 7px; border-radius: 4px; background: var(--grySoft); overflow: hidden; }
+.pb-prog i { display: block; height: 100%; border-radius: 4px; background: var(--side); }
+.pb-ft { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); font-size: 12px; }
+.pb-ft span { color: var(--mute); display: block; }
+.pb-ft b { font-weight: 700; color: var(--ink); }
+.pb-ft .pb-tag { display: inline-block; color: #5b6275; }

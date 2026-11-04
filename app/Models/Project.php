@@ -10,6 +10,7 @@ use App\Enums\Origin;
 use App\Enums\ProjectType;
 use App\Filament\Resources\Projects\ProjectResource;
 use App\Models\Concerns\LogsModelActivity;
+use Carbon\CarbonInterface;
 use Database\Factories\ProjectFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -159,15 +160,53 @@ class Project extends Model
         $query->notFinal()->whereNotNull('due_date')->whereDate('due_date', '<=', today()->addDays(7));
     }
 
-    /** Has a material still awaited and requested more than 7 days ago (same rule as the daily reminders). */
-    public function scopeMaterialOverdue(Builder $query): void
+    /** Days after which an awaited material counts as late. */
+    public const LATE_MATERIAL_DAYS = 7;
+
+    /** Last instant at which a request is already late, relative to the given day. */
+    public static function lateMaterialThreshold(?CarbonInterface $today = null): CarbonInterface
     {
-        $threshold = today()->subDays(7)->endOfDay();
+        return ($today ?? today())->copy()->subDays(self::LATE_MATERIAL_DAYS)->endOfDay();
+    }
+
+    /** Has a material still awaited and requested more than 7 days ago (same rule as hasLateMaterial()). */
+    public function scopeMaterialOverdue(Builder $query, ?CarbonInterface $today = null): void
+    {
+        $threshold = self::lateMaterialThreshold($today)->format('Y-m-d H:i:s');
 
         $query->whereHas('materials', fn (Builder $m) => $m
             ->where('status', MaterialStatus::Atteso->value)
             ->whereNotNull('requested_at')
             ->where('requested_at', '<=', $threshold));
+    }
+
+    /**
+     * Awaited materials requested more than 7 days ago (uses the loaded `materials` relation).
+     *
+     * @return Collection<int, Material>
+     */
+    public function lateMaterials(?CarbonInterface $today = null): Collection
+    {
+        $threshold = self::lateMaterialThreshold($today)->format('Y-m-d H:i:s');
+
+        return $this->materials
+            ->filter(fn (Material $m) => $m->status === MaterialStatus::Atteso
+                && $m->requested_at !== null
+                && $m->requested_at->format('Y-m-d H:i:s') <= $threshold)
+            ->values();
+    }
+
+    public function hasLateMaterial(?CarbonInterface $today = null): bool
+    {
+        return $this->lateMaterials($today)->isNotEmpty();
+    }
+
+    /** Past its due date and not finished. */
+    public function isOverdue(): bool
+    {
+        return $this->due_date !== null
+            && ! $this->workflow()->isFinal($this->status)
+            && $this->due_date->isBefore(today());
     }
 
     protected function activityLogExcept(): array
