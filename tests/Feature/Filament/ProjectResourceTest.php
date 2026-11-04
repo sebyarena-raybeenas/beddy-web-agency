@@ -204,6 +204,8 @@ it('handles a stale page: the state changed elsewhere is no longer selectable', 
 
 it('lets a stale page move back to the previous state through the real service', function () {
     $project = Project::factory()->create();
+    // An open mandatory requirement keeps the project out of the automatic ready state.
+    $project->requirements()->create(['label' => 'Logo', 'is_mandatory' => true, 'sort' => 1]);
 
     $page = Livewire::test(ProjectDetail::class, ['record' => $project->getRouteKey()])
         ->mountAction('changeStatus');
@@ -216,4 +218,21 @@ it('lets a stale page move back to the previous state through the real service',
 
     expect($project->fresh()->status)->toBe('in_preparazione')
         ->and($project->statusHistory()->count())->toBe(3);
+});
+
+it('rejects a disallowed file type on a material upload', function () {
+    Storage::fake(Attachment::DISK);
+    $project = seededProject($this->user);
+    $material = $project->materials()->where('kind', 'foto')->firstOrFail();
+    $file = UploadedFile::fake()->create('virus.exe', 10, 'application/x-msdownload');
+
+    Livewire::test(MaterialsRelationManager::class, ['ownerRecord' => $project, 'pageClass' => EditProject::class])
+        ->callAction(TestAction::make('edit')->table($material), ['status' => 'atteso', 'files' => [$file]])
+        ->assertHasActionErrors(['files']);
+
+    expect($material->attachments()->count())->toBe(0);
+});
+
+it('allows material uploads up to the 20 MB limit at the Livewire layer too', function () {
+    expect(config('livewire.temporary_file_upload.rules'))->toContain('max:20480');
 });

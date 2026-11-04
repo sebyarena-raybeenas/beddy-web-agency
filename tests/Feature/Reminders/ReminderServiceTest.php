@@ -61,6 +61,7 @@ it('sends the deadline reminder from day 7 and repeats daily', function () {
 it('stops after the status changes', function () {
     day('2026-11-10');
     $project = ownedProject('in_preparazione');
+    $project->requirements()->create(['label' => 'Logo', 'is_mandatory' => true, 'sort' => 1]);
     app(ProjectStatusService::class)->change($project, 'in_sviluppo', null);
 
     expect(runReminders('2026-11-17'))->toBe(1);
