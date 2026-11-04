@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beddy Web Agency – demo grafica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --side:#2b2257;--side2:#3a2f73;--sideTxt:#c9c3ec;
+  --acc:#6c4ce0;--accSoft:#efeafe;
+  --bg:#f5f6fa;--card:#fff;--ink:#1c1f2e;--mute:#7a7f93;--line:#eceef3;
+  --grn:#1aa37a;--grnSoft:#e3f7ef;--amb:#f08c00;--ambSoft:#fff3e0;--red:#e03e6b;--redSoft:#fde7ee;--blu:#2f80ed;--bluSoft:#e6f0fd;--vio:#8e5cf7;--vioSoft:#f1eafe;--gry:#8a90a2;--grySoft:#eef0f4;--tea:#0ea5b7;--teaSoft:#e0f6f8
+}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 "Plus Jakarta Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+a{color:inherit;text-decoration:none}
+.app{display:flex;min-height:100vh}
+/* SIDEBAR */
+aside{width:248px;flex:none;background:var(--side);color:var(--sideTxt);padding:22px 16px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
+.logo{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:17px;padding:0 8px 18px}
+.logo i{width:38px;height:38px;border-radius:12px;background:#fff;color:var(--side);display:grid;place-items:center;font-style:normal;font-size:18px}
+.logo small{display:block;font-weight:500;font-size:11px;color:var(--sideTxt)}
+.nav{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:500}
+.nav:hover{background:var(--side2);color:#fff}
+.nav.on{background:#fff;color:var(--side);font-weight:700}
+.nav .ic{width:20px;text-align:center}
+.nav .badge{margin-left:auto;background:var(--red);color:#fff;font-size:11px;border-radius:10px;padding:0 7px}
+.sideh{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8f87c4;margin:18px 12px 6px}
+.mini{display:flex;align-items:center;gap:8px;padding:6px 12px;font-size:13px;cursor:pointer}
+.mini .d{width:8px;height:8px;border-radius:50%}
+.sync{margin-top:auto;background:var(--side2);border-radius:12px;padding:12px;font-size:12px}
+.sync b{color:#fff;display:block}
+/* MAIN */
+main{flex:1;min-width:0}
+.top{display:flex;align-items:center;gap:16px;padding:16px 28px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.search{flex:0 1 340px;display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:10px;padding:9px 14px;color:var(--mute)}
+.top .sp{flex:1}
+.avs{display:flex}
+.av{width:32px;height:32px;border-radius:50%;display:inline-grid;place-items:center;font-size:12px;font-weight:700;color:#fff;border:2px solid #fff;flex:none}
+.avs .av+.av{margin-left:-9px}
+.bell{position:relative;width:38px;height:38px;border-radius:10px;background:var(--bg);display:grid;place-items:center;cursor:pointer}
+.bell em{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-style:normal;border-radius:9px;padding:0 5px;font-weight:700}
+.me{display:flex;align-items:center;gap:10px}
+.me small{display:block;color:var(--mute);font-size:11px}
+.page{padding:26px 28px 60px;display:none}
+.page.on{display:block}
+.ph{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.ph h1{margin:0;font-size:24px;font-weight:800}
+.ph .sp{flex:1}
+.btn{border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn.pri{background:var(--acc);color:#fff}
+.btn.ghost{background:var(--card);border:1px solid var(--line);color:var(--ink)}
+.btn.soft{background:var(--accSoft);color:var(--acc)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px}
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:18px}
+.stat{padding:14px 16px;cursor:pointer;border:2px solid transparent}
+.stat.on{border-color:var(--acc)}
+.stat .n{font-size:24px;font-weight:800}
+.stat .l{font-size:12px;color:var(--mute);font-weight:600}
+.stat .bar{height:4px;border-radius:2px;margin-top:8px}
+/* TOOLBAR */
+.tb{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-weight:600;font-size:13px;cursor:pointer}
+.seg{margin-left:auto;display:flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg span{padding:6px 12px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;color:var(--mute)}
+.seg span.on{background:var(--accSoft);color:var(--acc)}
+/* PILL */
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.p-prep{background:var(--grySoft);color:#5b6275}
+.p-ready{background:var(--grnSoft);color:var(--grn)}
+.p-dev{background:var(--bluSoft);color:var(--blu)}
+.p-feed{background:var(--ambSoft);color:var(--amb)}
+.p-mod{background:var(--redSoft);color:var(--red)}
+.p-pub{background:var(--vioSoft);color:var(--vio)}
+.p-live{background:var(--teaSoft);color:var(--tea)}
+.tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;background:var(--grySoft);color:#5b6275}
+.tag.asana{background:#fde8ef;color:#d6336c}
+.tag.man{background:var(--teaSoft);color:var(--tea)}
+/* GRID CARDS */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px}
+.pc{padding:18px 20px;cursor:pointer;transition:.15s}
+.pc:hover{box-shadow:0 10px 30px rgba(43,34,87,.08);transform:translateY(-2px)}
+.pc .hd{display:flex;gap:10px;align-items:flex-start}
+.pc .tt{border-left:4px solid var(--acc);padding-left:10px;flex:1}
+.pc h3{margin:0;font-size:16px;font-weight:800}
+.pc .cl{font-size:13px;color:var(--mute)}
+.pc .mid{display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px;font-size:12.5px;color:var(--mute)}
+.prog{height:7px;border-radius:4px;background:var(--grySoft);overflow:hidden}
+.prog i{display:block;height:100%;border-radius:4px;background:var(--side)}
+.reqs{display:flex;gap:5px;margin-top:12px}
+.reqs b{flex:1;height:6px;border-radius:3px;background:var(--grySoft)}
+.reqs b.ok{background:var(--grn)}
+.pc .row{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.meta{display:flex;gap:12px;font-size:12px;color:var(--mute)}
+.pc .ft{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);font-size:12px}
+.pc .ft span{color:var(--mute);display:block}
+.pc .ft b{font-weight:700}
+.warn{color:var(--red);font-weight:700}
+/* KANBAN */
+.kan{display:grid;grid-template-columns:repeat(5,minmax(230px,1fr));gap:16px;overflow-x:auto;padding-bottom:6px}
+.col h4{margin:0 0 10px;font-size:14px;display:flex;align-items:center;gap:8px}
+.col h4 em{font-style:normal;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:0 7px;font-size:12px;color:var(--mute)}
+.kc{padding:14px;margin-bottom:12px;border-bottom:4px solid var(--acc);cursor:pointer}
+.kc h5{margin:6px 0 2px;font-size:14px}
+.kc p{margin:0 0 10px;color:var(--mute);font-size:12.5px}
+/* LIST */
+table{width:100%;border-collapse:collapse}
+th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-size:12px;color:var(--mute);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+tr.cl{cursor:pointer}tr.cl:hover td{background:#fafaff}
+/* DETAIL */
+.crumb{font-size:13px;color:var(--mute);margin-bottom:14px}
+.crumb a{color:var(--acc);font-weight:700;cursor:pointer}
+.hero{overflow:hidden;margin-bottom:20px}
+.cover{height:120px;background:linear-gradient(120deg,#2b2257 0%,#6c4ce0 55%,#b89cff 100%);position:relative}
+.cover .shot{position:absolute;right:28px;bottom:-40px;width:210px;height:130px;border-radius:12px;background:#fff;box-shadow:0 12px 30px rgba(0,0,0,.18);padding:10px}
+.shot .b1{height:12px;width:60%;background:var(--grySoft);border-radius:4px;margin-bottom:8px}
+.shot .b2{height:52px;background:linear-gradient(90deg,#efeafe,#e6f0fd);border-radius:6px;margin-bottom:8px}
+.shot .b3{display:flex;gap:6px}.shot .b3 i{flex:1;height:24px;background:var(--grySoft);border-radius:4px}
+.hbody{padding:20px 26px 22px}
+.hbody h2{margin:0;font-size:24px;font-weight:800}
+.hbody .by{color:var(--mute);font-size:13px;margin:2px 0 16px}
+.hact{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.stbtn{position:relative}
+.stbtn .btn{background:var(--blu);color:#fff}
+.hmeta{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+.hmeta span{display:block;font-size:12px;color:var(--mute);font-weight:600}
+.hmeta b{font-size:14px}
+.steps{display:flex;padding:18px 22px;gap:0;margin-bottom:20px;overflow-x:auto}
+.step{flex:1;min-width:110px;text-align:center;position:relative;font-size:12px;font-weight:600;color:var(--mute)}
+.step::before{content:"";position:absolute;top:13px;left:-50%;width:100%;height:3px;background:var(--grySoft);z-index:0}
+.step:first-child::before{display:none}
+.step i{position:relative;z-index:1;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;margin:0 auto 6px;background:var(--grySoft);color:var(--mute);font-style:normal;font-size:12px;font-weight:800}
+.step.done i{background:var(--grn);color:#fff}.step.done::before{background:var(--grn)}
+.step.cur i{background:var(--blu);color:#fff;box-shadow:0 0 0 5px var(--bluSoft)}.step.cur::before{background:var(--grn)}
+.step.cur{color:var(--blu)}
+.dgrid{display:grid;grid-template-columns:1.6fr 1fr;gap:20px}
+.box{padding:20px 22px;margin-bottom:20px}
+.box h3{margin:0 0 14px;font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px}
+.box h3 .sp{flex:1}
+.box h3 small{font-weight:600;color:var(--mute);font-size:12px}
+.chk{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.chk:last-child{border:0}
+.cb{width:22px;height:22px;border-radius:7px;border:2px solid #cfd3de;display:grid;place-items:center;flex:none;cursor:pointer;font-size:13px;color:#fff}
+.cb.ok{background:var(--grn);border-color:var(--grn)}
+.chk .t{flex:1}
+.chk .t small{display:block;color:var(--mute);font-size:12px}
+.chk .r{font-size:12px;color:var(--mute);display:flex;align-items:center;gap:8px}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.kv:last-child{border:0}
+.kv span{color:var(--mute)}
+.kv b{text-align:right}
+.tl{position:relative;padding-left:18px}
+.tl::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tli{position:relative;padding:0 0 14px 18px;font-size:13px}
+.tli::before{content:"";position:absolute;left:-17px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--acc);border:2px solid #fff;box-shadow:0 0 0 2px var(--accSoft)}
+.tli small{display:block;color:var(--mute);font-size:11.5px}
+.appt{display:flex;gap:14px;align-items:center;background:var(--accSoft);border-radius:12px;padding:12px 14px}
+.appt .dt{background:#fff;border-radius:10px;text-align:center;padding:6px 10px;font-weight:800;color:var(--acc);line-height:1.1}
+.appt .dt small{display:block;font-size:10px;font-weight:700;color:var(--mute)}
+.cmt{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.cmt:last-child{border:0}
+.cmt p{margin:2px 0 0;font-size:13.5px}
+.cmt small{color:var(--mute);font-size:12px;font-weight:500;margin-left:6px}
+.input{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:6px;color:var(--mute)}
+.input .sp{flex:1}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:-4px 0 14px}
+.tabs span{padding:8px 12px;font-weight:700;font-size:13px;color:var(--mute);cursor:pointer;border-bottom:2px solid transparent}
+.tabs span.on{color:var(--acc);border-color:var(--acc)}
+.alert{display:flex;gap:10px;align-items:center;background:var(--bluSoft);color:#1d5fbf;border-radius:12px;padding:12px 16px;margin-bottom:20px;font-weight:600;font-size:13.5px}
+/* CLIENTS */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.cc{padding:18px 20px}
+.cc .hd{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.cc .lg{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-weight:800;color:#fff;font-size:16px}
+.cc h3{margin:0;font-size:15px}
+.ph-note{background:var(--card);border:1px dashed #cfc6f5;border-radius:16px;padding:40px;text-align:center;color:var(--mute)}
+.demo-note{position:fixed;right:16px;bottom:16px;background:var(--ink);color:#fff;font-size:12px;padding:8px 12px;border-radius:10px;opacity:.85;max-width:300px}
+@media(max-width:1100px){.stats{grid-template-columns:repeat(3,1fr)}.dgrid{grid-template-columns:1fr}.hmeta{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){aside{display:none}.top{padding:12px 16px}.page{padding:18px 16px}.search{display:none}.stats{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.cover .shot{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="logo"><i>B</i><div>Beddy<small>Web Agency</small></div></div>
+  <div class="nav" data-go="dash"><span class="ic">◧</span>Dashboard</div>
+  <div class="nav on" data-go="proj"><span class="ic">▤</span>Progetti</div>
+  <div class="nav" data-go="cli"><span class="ic">☺</span>Clienti</div>
+  <div class="nav" data-go="mine"><span class="ic">✓</span>I miei task<span class="badge">5</span></div>
+  <div class="nav" data-go="cal"><span class="ic">▦</span>Calendario</div>
+  <div class="nav" data-go="team"><span class="ic">◎</span>Team</div>
+  <div class="sideh">Pronti da sviluppare</div>
+  <div class="mini" data-open="1"><span class="d" style="background:var(--grn)"></span>Villa Gelsomino</div>
+  <div class="mini" data-open="1"><span class="d" style="background:var(--grn)"></span>Trattoria Il Faro</div>
+  <div class="sideh">Scadenze vicine</div>
+  <div class="mini" data-open="1"><span class="d" style="background:var(--red)"></span>Hotel Miramonti · 2 gg</div>
+  <div class="mini" data-open="1"><span class="d" style="background:var(--amb)"></span>B&B Le Zagare · 4 gg</div>
+  <div class="sync"><b>⟳ Asana sincronizzato</b>oggi alle 08:00 · 3 aggiornamenti da confermare</div>
+</aside>
+
+<main>
+  <div class="top">
+    <div class="search">⌕ Cerca progetti, clienti, task…</div>
+    <div class="sp"></div>
+    <div class="avs"><span class="av" style="background:#6c4ce0">SA</span><span class="av" style="background:#1aa37a">LR</span><span class="av" style="background:#f08c00">MC</span><span class="av" style="background:#cfd3de;color:#5b6275">+</span></div>
+    <div class="bell">🔔<em>4</em></div>
+    <div class="me"><span class="av" style="background:var(--side)">SA</span><div><b>Utente</b><small>Web Designer</small></div></div>
+  </div>
+
+  <!-- PROGETTI -->
+  <section class="page on" id="proj">
+    <div class="ph"><h1>Progetti</h1><div class="sp"></div><button class="btn ghost">⇣ Importa da Asana</button><button class="btn pri">＋ Nuovo progetto</button></div>
+    <div class="stats">
+      <div class="card stat on"><div class="n">18</div><div class="l">Tutti attivi</div><div class="bar" style="background:var(--acc)"></div></div>
+      <div class="card stat"><div class="n">6</div><div class="l">In preparazione</div><div class="bar" style="background:var(--gry)"></div></div>
+      <div class="card stat"><div class="n">2</div><div class="l">Pronti da sviluppare</div><div class="bar" style="background:var(--grn)"></div></div>
+      <div class="card stat"><div class="n">4</div><div class="l">In sviluppo</div><div class="bar" style="background:var(--blu)"></div></div>
+      <div class="card stat"><div class="n">5</div><div class="l">Feedback cliente</div><div class="bar" style="background:var(--amb)"></div></div>
+      <div class="card stat"><div class="n">1</div><div class="l">In pubblicazione</div><div class="bar" style="background:var(--vio)"></div></div>
+    </div>
+    <div class="tb">
+      <span class="chip">⚲ Tipo: tutti ▾</span><span class="chip">👤 Responsabile: tutti ▾</span><span class="chip">⇄ Origine: tutte ▾</span><span class="chip">⚠ Solo con elementi mancanti</span>
+      <div class="seg" id="viewseg"><span class="on" data-v="g">▦ Griglia</span><span data-v="k">▥ Kanban</span><span data-v="l">☰ Lista</span></div>
+    </div>
+    <div id="vg" class="grid"></div>
+    <div id="vk" class="kan" style="display:none"></div>
+    <div id="vl" class="card" style="display:none;overflow-x:auto"></div>
+  </section>
+
+  <!-- DETTAGLIO -->
+  <section class="page" id="det">
+    <div class="crumb"><a data-go="proj">Progetti</a> / Villa Gelsomino — Nuovo sito</div>
+    <div class="alert">ℹ Hai iniziato lo sviluppo 3 giorni fa: la scadenza della settimana di sviluppo è <b>&nbsp;sabato 7 novembre</b>.</div>
+    <div class="card hero">
+      <div class="cover"><div class="shot"><div class="b1"></div><div class="b2"></div><div class="b3"><i></i><i></i><i></i></div></div></div>
+      <div class="hbody">
+        <h2>Villa Gelsomino — Nuovo sito</h2>
+        <div class="by">Cliente <a style="color:var(--acc);font-weight:700" data-go="cli">Villa Gelsomino S.r.l.</a> · creato da Utente il 12 ottobre · <span class="tag asana">collegato ad Asana</span></div>
+        <div class="hact">
+          <div class="stbtn"><button class="btn">● In sviluppo ▾</button></div>
+          <button class="btn soft">👤＋ Assegna</button>
+          <button class="btn ghost">✎ Modifica</button>
+          <button class="btn ghost">📅 Fissa appuntamento</button>
+          <button class="btn ghost">↗ Apri su Asana</button>
+          <div class="sp" style="flex:1"></div>
+          <div class="avs"><span class="av" style="background:#6c4ce0">SA</span><span class="av" style="background:#1aa37a">LR</span></div>
+        </div>
+        <div class="hmeta">
+          <div><span>Tipo</span><b>Sviluppo nuovo sito</b></div>
+          <div><span>Inizio sviluppo</span><b>sabato 31 ottobre</b></div>
+          <div><span>Scadenza sviluppo</span><b style="color:var(--amb)">7 novembre · 4 gg rimasti</b></div>
+          <div><span>Avanzamento to-do</span><b>9 / 17</b><div class="prog" style="margin-top:6px"><i style="width:53%"></i></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card steps">
+      <div class="step done"><i>✓</i>In preparazione</div>
+      <div class="step done"><i>✓</i>Pronto da sviluppare</div>
+      <div class="step cur"><i>3</i>In sviluppo</div>
+      <div class="step"><i>4</i>Presentazione · feedback</div>
+      <div class="step"><i>5</i>Modifiche</div>
+      <div class="step"><i>6</i>In pubblicazione</div>
+      <div class="step"><i>7</i>Sito pubblicato</div>
+    </div>
+
+    <div class="dgrid">
+      <div>
+        <div class="card box">
+          <h3>Requisiti obbligatori <span class="pill p-ready">6 / 6 completati</span><span class="sp"></span><small>servono per "Pronto da sviluppare"</small></h3>
+          <div class="chk"><span class="cb ok">✓</span><div class="t">Informazioni preliminari complete<small>contatti, acconto, dominio, hosting, assistenza</small></div><div class="r">14/10 · <span class="av" style="background:#6c4ce0;width:24px;height:24px;font-size:10px">SA</span></div></div>
+          <div class="chk"><span class="cb ok">✓</span><div class="t">Cliente contattato</div><div class="r">15/10 · <span class="av" style="background:#6c4ce0;width:24px;height:24px;font-size:10px">SA</span></div></div>
+          <div class="chk"><span class="cb ok">✓</span><div class="t">Struttura sito inviata via mail</div><div class="r">18/10 · <span class="av" style="background:#6c4ce0;width:24px;height:24px;font-size:10px">SA</span></div></div>
+          <div class="chk"><span class="cb ok">✓</span><div class="t">Materiale: foto<small>24 file · cartella condivisa</small></div><div class="r">27/10</div></div>
+          <div class="chk"><span class="cb ok">✓</span><div class="t">Materiale: testi<small>Testi_sito.docx</small></div><div class="r">28/10</div></div>
+          <div class="chk"><span class="cb ok">✓</span><div class="t">Materiale: logo<small>logo-vettoriale.svg</small></div><div class="r">22/10</div></div>
+        </div>
+
+        <div class="card box">
+          <div class="tabs"><span class="on">To-do (17)</span><span>Richieste cliente (4)</span><span>Siti d'esempio (3)</span><span>File</span></div>
+          <div class="chk"><span class="cb ok">✓</span><div class="t">Struttura pagine e menu</div><div class="r"><span class="av" style="background:#6c4ce0;width:24px;height:24px;font-size:10px">SA</span></div></div>
+          <div class="chk"><span class="cb ok">✓</span><div class="t">Home page</div><div class="r"><span class="av" style="background:#6c4ce0;width:24px;height:24px;font-size:10px">SA</span></div></div>
+          <div class="chk"><span class="cb"></span><div class="t">Pagina camere con booking engine</div><div class="r">05/11 · <span class="av" style="background:#1aa37a;width:24px;height:24px;font-size:10px">LR</span></div></div>
+          <div class="chk"><span class="cb"></span><div class="t">Traduzioni EN / DE</div><div class="r">06/11 · <span class="av" style="background:#1aa37a;width:24px;height:24px;font-size:10px">LR</span></div></div>
+          <div class="chk"><span class="cb"></span><div class="t">Responsive</div><div class="r">07/11 · <span class="av" style="background:#6c4ce0;width:24px;height:24px;font-size:10px">SA</span></div></div>
+          <div style="margin-top:10px"><button class="btn soft">＋ Aggiungi to-do</button></div>
+        </div>
+
+        <div class="card box">
+          <h3>Discussione del team</h3>
+          <div class="input"><span>Scrivi un commento, @menziona un collega…</span><span class="sp"></span><span>📎</span><button class="btn pri" style="padding:7px 14px">Invia</button></div>
+          <div class="cmt"><span class="av" style="background:#1aa37a">LR</span><div><b>Luca</b><small>2 ore fa</small><p>Ho caricato le traduzioni in tedesco, manca solo la pagina "Dintorni".</p></div></div>
+          <div class="cmt"><span class="av" style="background:#6c4ce0">SA</span><div><b>Utente</b><small>ieri</small><p>@Luca ti ho assegnato la pagina camere, il codice del booking engine è nei file del progetto.</p></div></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card box">
+          <h3>Cliente <span class="sp"></span><span class="tag asana">da Asana</span></h3>
+          <div class="kv"><span>Referente</span><b>Giulia Ferri</b></div>
+          <div class="kv"><span>Telefono</span><b>+39 333 000 1122</b></div>
+          <div class="kv"><span>Email</span><b>info@villagelsomino.it</b></div>
+          <div class="kv"><span>Assistenza</span><b style="color:var(--grn)">Sì, annuale</b></div>
+          <div class="kv"><span>Dominio</span><b>villagelsomino.it · suo</b></div>
+          <div class="kv"><span>Hosting</span><b>Nostro server</b></div>
+        </div>
+        <div class="card box">
+          <h3>Prossimo appuntamento</h3>
+          <div class="appt"><div class="dt">10<small>NOV</small></div><div><b>Presentazione sito</b><div style="font-size:12px;color:var(--mute)">ore 11:00 · videochiamata</div></div></div>
+        </div>
+        <div class="card box">
+          <h3>Pagamenti</h3>
+          <div class="kv"><span>Acconto 40%</span><b style="color:var(--grn)">✓ pagato 13/10</b></div>
+          <div class="kv"><span>Saldo 60%</span><b>alla pubblicazione</b></div>
+        </div>
+        <div class="card box">
+          <h3>Attività recente</h3>
+          <div class="tl">
+            <div class="tli"><b>Utente</b> ha cambiato lo stato in <b>In sviluppo</b><small>31 ottobre, 09:12</small></div>
+            <div class="tli"><b>Sistema</b>: tutti i requisiti completati → <b>Pronto da sviluppare</b><small>28 ottobre, 16:40</small></div>
+            <div class="tli"><b>Luca</b> ha segnato ricevuti i testi<small>28 ottobre, 16:40</small></div>
+            <div class="tli"><b>Asana</b>: nuovo commento importato<small>27 ottobre, 08:00</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLIENTI -->
+  <section class="page" id="cli">
+    <div class="ph"><h1>Clienti</h1><div class="sp"></div><button class="btn pri">＋ Nuovo cliente</button></div>
+    <div class="cgrid" id="cg"></div>
+  </section>
+
+  <section class="page" id="other"><div class="ph-note"><h2 style="margin-top:0">Sezione non inclusa nella demo</h2>La demo mostra solo Progetti, Dettaglio progetto e Clienti.</div></section>
+</main>
+</div>
+<div class="demo-note">Demo grafica generica · dati inventati · clicca su un progetto per aprirne il dettaglio</div>
+
+<script>
+const S={prep:["In preparazione","p-prep","var(--gry)"],ready:["Pronto da sviluppare","p-ready","var(--grn)"],dev:["In sviluppo","p-dev","var(--blu)"],feed:["In attesa di feedback","p-feed","var(--amb)"],mod:["Modifiche","p-mod","var(--red)"],pub:["In pubblicazione","p-pub","var(--vio)"]};
+const T={new:["Nuovo sito","var(--acc)"],mod:["Modifica","var(--tea)"],redo:["Rifacimento","var(--amb)"]};
+const U={SA:"#6c4ce0",LR:"#1aa37a",MC:"#f08c00"};
+const P=[
+ {n:"Nuovo sito",c:"Villa Gelsomino",t:"new",s:"dev",d:"7 nov",p:53,r:6,u:["SA","LR"],td:"9/17",o:"asana",dom:"Suo",acc:"Pagato"},
+ {n:"Nuovo sito",c:"Hotel Miramonti",t:"new",s:"mod",d:"2 nov",p:82,r:6,u:["LR"],td:"14/17",o:"asana",dom:"Nostro",acc:"Pagato",w:"scade tra 2 gg"},
+ {n:"Restyling completo",c:"B&B Le Zagare",t:"redo",s:"feed",d:"4 nov",p:90,r:6,u:["SA"],td:"15/17",o:"asana",dom:"Suo",acc:"Pagato"},
+ {n:"Nuovo sito",c:"Trattoria Il Faro",t:"new",s:"ready",d:"—",p:0,r:6,u:["SA"],td:"0/17",o:"man",dom:"Da acquistare",acc:"Pagato"},
+ {n:"Pagina offerte estate",c:"Agriturismo Poggio Verde",t:"mod",s:"prep",d:"20 nov",p:0,r:3,u:["MC"],td:"0/4",o:"man",dom:"Suo",acc:"—",w:"mancano foto e testi"},
+ {n:"Nuovo sito",c:"Residence Costa Blu",t:"new",s:"prep",d:"—",p:0,r:4,u:["LR"],td:"0/17",o:"asana",dom:"Nostro",acc:"In attesa",w:"acconto non pagato"},
+ {n:"Nuovo sito",c:"Casa Vacanze Lumia",t:"new",s:"pub",d:"3 nov",p:96,r:6,u:["SA","LR"],td:"16/17",o:"asana",dom:"Nostro",acc:"Pagato"},
+ {n:"Multilingua",c:"Hotel Bellavista Lago",t:"mod",s:"dev",d:"6 nov",p:40,r:6,u:["MC"],td:"2/5",o:"man",dom:"Suo",acc:"Pagato"}
+];
+const av=a=>a.map(x=>`<span class="av" style="background:${U[x]};width:28px;height:28px;font-size:11px">${x}</span>`).join("");
+const reqs=n=>`<div class="reqs" title="${n}/6 requisiti">${[0,1,2,3,4,5].map(i=>`<b class="${i<n?'ok':''}"></b>`).join("")}</div>`;
+document.getElementById("vg").innerHTML=P.map(p=>`
+ <div class="card pc" data-open="1">
+  <div class="hd"><div class="tt" style="border-color:${T[p.t][1]}"><h3>${p.c}</h3><div class="cl">${p.n} · ${T[p.t][0]}</div></div><span class="pill ${S[p.s][1]}">${S[p.s][0]}</span></div>
+  <div class="mid"><span>📅 Scadenza: ${p.d}</span><span>${p.w?`<span class="warn">⚠ ${p.w}</span>`:''}</span></div>
+  <div class="mid" style="margin:4px 0 6px"><span>Avanzamento to-do</span><b style="color:var(--ink)">${p.p}%</b></div>
+  <div class="prog"><i style="width:${p.p}%"></i></div>
+  ${reqs(p.r)}
+  <div class="row"><div class="avs">${av(p.u)}</div><div class="meta"><span>☑ ${p.td} to-do</span><span>✓ ${p.r}/6 requisiti</span></div></div>
+  <div class="ft"><div><span>Dominio / hosting</span><b>${p.dom}</b></div><div><span>Acconto</span><b>${p.acc}</b></div><div><span>Origine</span><b>${p.o=="asana"?'<span class="tag asana">Asana</span>':'<span class="tag man">Manuale</span>'}</b></div><div><span>Responsabile</span><b>${p.u[0]=="SA"?"Utente":p.u[0]=="LR"?"Luca":"Marta"}</b></div></div>
+ </div>`).join("");
+const cols=["prep","ready","dev","feed","pub"];
+document.getElementById("vk").innerHTML=cols.map(k=>{const it=P.filter(p=>p.s==k||(k=="feed"&&p.s=="mod"));return `<div class="col"><h4><span class="pill ${S[k][1]}">${S[k][0]}</span><em>${it.length}</em></h4>${it.map(p=>`<div class="card kc" data-open="1" style="border-bottom-color:${S[p.s][2]}"><span class="tag" style="background:${T[p.t][1]}22;color:${T[p.t][1]}">${T[p.t][0]}</span><h5>${p.c}</h5><p>${p.n}</p>${reqs(p.r)}<div class="row" style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><div class="avs">${av(p.u)}</div><span style="font-size:12px;color:var(--mute)">📅 ${p.d}</span></div></div>`).join("")}</div>`}).join("");
+document.getElementById("vl").innerHTML=`<table><tr><th>Cliente / progetto</th><th>Tipo</th><th>Stato</th><th>Requisiti</th><th>To-do</th><th>Responsabile</th><th>Scadenza</th><th>Avvisi</th></tr>${P.map(p=>`<tr class="cl" data-open="1"><td><b>${p.c}</b><div style="font-size:12px;color:var(--mute)">${p.n}</div></td><td>${T[p.t][0]}</td><td><span class="pill ${S[p.s][1]}">${S[p.s][0]}</span></td><td>${p.r}/6</td><td><div class="prog" style="width:90px"><i style="width:${p.p}%"></i></div></td><td><div class="avs">${av(p.u)}</div></td><td>${p.d}</td><td>${p.w?`<span class="warn">${p.w}</span>`:'—'}</td></tr>`).join("")}</table>`;
+const C=[["Villa Gelsomino","#6c4ce0",2,"asana"],["Hotel Miramonti","#1aa37a",1,"asana"],["B&B Le Zagare","#f08c00",1,"asana"],["Trattoria Il Faro","#e03e6b",1,"man"],["Agriturismo Poggio Verde","#0ea5b7",3,"man"],["Residence Costa Blu","#2f80ed",1,"asana"]];
+document.getElementById("cg").innerHTML=C.map(c=>`<div class="card cc"><div class="hd"><div class="lg" style="background:${c[1]}">${c[0][0]}</div><div><h3>${c[0]}</h3><span class="tag ${c[3]=="asana"?"asana":"man"}">${c[3]=="asana"?"Asana":"Manuale"}</span></div></div><div class="kv"><span>Progetti</span><b>${c[2]}</b></div><div class="kv"><span>Assistenza</span><b>Sì</b></div><div class="kv"><span>Ultimo contatto</span><b>3 giorni fa</b></div></div>`).join("");
+function go(id){document.querySelectorAll(".page").forEach(p=>p.classList.remove("on"));(document.getElementById(id)||document.getElementById("other")).classList.add("on");document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("on",n.dataset.go==id||(id=="det"&&n.dataset.go=="proj")));scrollTo(0,0)}
+document.addEventListener("click",e=>{const g=e.target.closest("[data-go]");if(g){go(g.dataset.go);return}const o=e.target.closest("[data-open]");if(o){go("det");return}const v=e.target.closest("[data-v]");if(v){document.querySelectorAll("#viewseg span").forEach(s=>s.classList.toggle("on",s==v));["g","k","l"].forEach(k=>document.getElementById("v"+k).style.display=k==v.dataset.v?"":"none")}const st=e.target.closest(".stat");if(st){document.querySelectorAll(".stat").forEach(s=>s.classList.toggle("on",s==st))}});
+</script>
+</body>
+</html>
