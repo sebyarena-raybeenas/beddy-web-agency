@@ -1,9 +1,13 @@
 <?php
 
 use App\Domain\Users\InviteUser;
+use App\Filament\Resources\Users\Pages\CreateUser;
+use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Models\User;
 use App\Notifications\UserInvitation;
+use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 
@@ -51,7 +55,7 @@ it('records last login time on login', function () {
     $user = User::factory()->create();
     expect($user->last_login_at)->toBeNull();
 
-    event(new Illuminate\Auth\Events\Login('web', $user, false));
+    event(new Login('web', $user, false));
 
     expect($user->fresh()->last_login_at)->not->toBeNull();
 });
@@ -60,7 +64,7 @@ it('invites a user from the Filament create page', function () {
     Notification::fake();
     $this->actingAs(User::factory()->create());
 
-    Livewire\Livewire::test(App\Filament\Resources\Users\Pages\CreateUser::class)
+    Livewire\Livewire::test(CreateUser::class)
         ->fillForm(['name' => 'Nuovo Utente', 'email' => 'nuovo@example.test'])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -87,8 +91,8 @@ it('resends from the users table action', function () {
     $this->actingAs(User::factory()->create());
     $target = User::factory()->create();
 
-    Livewire\Livewire::test(App\Filament\Resources\Users\Pages\ListUsers::class)
-        ->callAction(\Filament\Actions\Testing\TestAction::make('resendInvitation')->table($target));
+    Livewire\Livewire::test(ListUsers::class)
+        ->callAction(TestAction::make('resendInvitation')->table($target));
 
     Notification::assertSentTo($target, UserInvitation::class);
 });

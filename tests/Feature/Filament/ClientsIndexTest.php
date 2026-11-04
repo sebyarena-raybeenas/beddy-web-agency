@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Workflow\WorkflowRegistry;
 use App\Enums\DomainRole;
 use App\Filament\Pages\ClientsIndex;
 use App\Filament\Resources\Clients\ClientResource;
@@ -53,8 +54,8 @@ it('shows active projects count, per-status counts and primary domains', functio
     $p1 = Project::factory()->create(['client_id' => $client->id]);
     Project::factory()->create(['client_id' => $client->id]);
     $done = Project::factory()->create(['client_id' => $client->id]);
-    $final = collect(app(\App\Domain\Workflow\WorkflowRegistry::class)->get('sito')->states())
-        ->keys()->first(fn ($s) => app(\App\Domain\Workflow\WorkflowRegistry::class)->get('sito')->isFinal($s));
+    $final = collect(app(WorkflowRegistry::class)->get('sito')->states())
+        ->keys()->first(fn ($s) => app(WorkflowRegistry::class)->get('sito')->isFinal($s));
     $done->forceFill(['status' => $final])->save();
     Domain::create(['client_id' => $client->id, 'project_id' => $p1->id, 'name' => 'rossi.it', 'role' => DomainRole::Principale]);
     Domain::create(['client_id' => $client->id, 'project_id' => $p1->id, 'name' => 'secondo.it', 'role' => DomainRole::Secondario]);

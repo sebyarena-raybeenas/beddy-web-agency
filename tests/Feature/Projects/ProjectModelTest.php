@@ -1,10 +1,13 @@
 <?php
 
+use App\Domain\Projects\ProjectCreator;
 use App\Domain\Workflow\InvalidTransition;
 use App\Enums\ProjectType;
+use App\Models\Client;
 use App\Models\Domain;
 use App\Models\Project;
 use App\Models\User;
+use Database\Seeders\TemplateSeeder;
 
 it('locks the project type after creation', function () {
     $project = Project::factory()->create();
@@ -45,12 +48,12 @@ it('records the authenticated user in the first history row', function () {
 });
 
 it('records the creator passed to ProjectCreator in the first history row, over the authenticated user', function () {
-    $this->seed(Database\Seeders\TemplateSeeder::class);
+    $this->seed(TemplateSeeder::class);
     $creator = User::factory()->create();
     $this->actingAs(User::factory()->create());
 
-    $project = app(App\Domain\Projects\ProjectCreator::class)->create([
-        'client_id' => App\Models\Client::factory()->create()->id,
+    $project = app(ProjectCreator::class)->create([
+        'client_id' => Client::factory()->create()->id,
         'name' => 'Progetto',
         'type' => 'nuovo',
     ], $creator);

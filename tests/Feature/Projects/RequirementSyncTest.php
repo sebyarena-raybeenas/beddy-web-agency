@@ -1,9 +1,13 @@
 <?php
 
 use App\Domain\Projects\ProjectCreator;
+use App\Domain\Projects\RequirementSync;
+use App\Domain\Workflow\ProjectStatusService;
 use App\Enums\MaterialStatus;
 use App\Models\Client;
 use App\Models\Project;
+use App\Models\RequirementTemplate;
+use App\Models\User;
 use Database\Seeders\TemplateSeeder;
 
 beforeEach(fn () => $this->seed(TemplateSeeder::class));
@@ -128,7 +132,7 @@ it('re-evaluates when is_mandatory flips on the only open requirement', function
 });
 
 it('is ready immediately when the flow has no mandatory templates', function () {
-    App\Models\RequirementTemplate::query()->update(['is_mandatory' => false]);
+    RequirementTemplate::query()->update(['is_mandatory' => false]);
 
     $project = newProject('modifica');
 
@@ -138,17 +142,17 @@ it('is ready immediately when the flow has no mandatory templates', function () 
 
 it('evaluates once while ProjectCreator copies the templates', function () {
     $evaluations = 0;
-    app()->bind(App\Domain\Projects\RequirementSync::class, function ($app) use (&$evaluations) {
-        return new class($app->make(App\Domain\Workflow\ProjectStatusService::class), function () use (&$evaluations) {
+    app()->bind(RequirementSync::class, function ($app) use (&$evaluations) {
+        return new class($app->make(ProjectStatusService::class), function () use (&$evaluations) {
             $evaluations++;
-        }) extends App\Domain\Projects\RequirementSync
+        }) extends RequirementSync
         {
-            public function __construct(App\Domain\Workflow\ProjectStatusService $status, private Closure $onEvaluate)
+            public function __construct(ProjectStatusService $status, private Closure $onEvaluate)
             {
                 parent::__construct($status);
             }
 
-            public function evaluate(App\Models\Project $project): void
+            public function evaluate(Project $project): void
             {
                 ($this->onEvaluate)();
                 parent::evaluate($project);
@@ -168,7 +172,7 @@ it('returns to ready after a manual move back to the initial state with all requ
     $project = $project->fresh();
 
     $state = $project->workflow()->initial();
-    app(App\Domain\Workflow\ProjectStatusService::class)->change($project, $state, App\Models\User::factory()->create());
+    app(ProjectStatusService::class)->change($project, $state, User::factory()->create());
 
     $project = $project->fresh();
     $history = $project->statusHistory->sortBy('id')->values();
