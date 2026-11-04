@@ -2,7 +2,10 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Domain\Users\InviteUser;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
@@ -23,6 +26,17 @@ class UsersTable
                     ->sortable(),
             ])
             ->recordActions([
+                Action::make('resendInvitation')
+                    ->label('Reinvia invito')
+                    ->icon('heroicon-o-envelope')
+                    ->requiresConfirmation()
+                    ->modalHeading('Reinvia invito')
+                    ->modalDescription('Verrà inviata una nuova email con un nuovo link per impostare la password.')
+                    ->action(function ($record): void {
+                        app(InviteUser::class)->resend($record);
+
+                        Notification::make()->title('Invito reinviato')->success()->send();
+                    }),
                 EditAction::make(),
             ]);
     }

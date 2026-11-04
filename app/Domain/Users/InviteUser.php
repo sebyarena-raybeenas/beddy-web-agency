@@ -28,10 +28,15 @@ class InviteUser
             'invited_at' => now(),
         ]);
 
+        $this->resend($user);
+
+        return $user;
+    }
+
+    public function resend(User $user): void
+    {
         $token = Password::broker()->createToken($user);
 
         $user->notify(new UserInvitation($token));
-
-        return $user;
     }
 }

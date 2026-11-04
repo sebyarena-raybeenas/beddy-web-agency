@@ -67,3 +67,28 @@ it('invites a user from the Filament create page', function () {
 
     Notification::assertSentTo(User::where('email', 'nuovo@example.test')->first(), UserInvitation::class);
 });
+
+it('resends an invitation with a new token', function () {
+    Notification::fake();
+    $user = User::factory()->create();
+
+    app(InviteUser::class)->resend($user);
+
+    Notification::assertSentTo($user, UserInvitation::class, function (UserInvitation $n) use ($user) {
+        $lines = collect($n->toMail($user)->outroLines)->implode(' ');
+
+        return str_contains($lines, config('auth.passwords.users.expire').' minuti')
+            && str_contains($lines, 'reinviarti');
+    });
+});
+
+it('resends from the users table action', function () {
+    Notification::fake();
+    $this->actingAs(User::factory()->create());
+    $target = User::factory()->create();
+
+    Livewire\Livewire::test(App\Filament\Resources\Users\Pages\ListUsers::class)
+        ->callAction(\Filament\Actions\Testing\TestAction::make('resendInvitation')->table($target));
+
+    Notification::assertSentTo($target, UserInvitation::class);
+});
