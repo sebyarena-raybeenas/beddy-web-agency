@@ -100,6 +100,16 @@ class Project extends Model
         return $this->hasMany(Domain::class);
     }
 
+    public function requirements(): HasMany
+    {
+        return $this->hasMany(ProjectRequirement::class)->orderBy('sort');
+    }
+
+    public function materials(): HasMany
+    {
+        return $this->hasMany(Material::class);
+    }
+
     public function statusHistory(): HasMany
     {
         return $this->hasMany(ProjectStatusChange::class)->orderBy('id');
