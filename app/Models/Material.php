@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\MaterialKind;
 use App\Enums\MaterialStatus;
+use App\Models\Concerns\LogsModelActivity;
 use App\Observers\MaterialObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 #[ObservedBy(MaterialObserver::class)]
 class Material extends Model
 {
+    use LogsModelActivity;
+
     protected $attributes = [
         'status' => 'atteso',
     ];

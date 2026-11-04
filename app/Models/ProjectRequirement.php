@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsModelActivity;
 use App\Observers\ProjectRequirementObserver;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[ObservedBy(ProjectRequirementObserver::class)]
 class ProjectRequirement extends Model
 {
+    use LogsModelActivity;
+
     protected function casts(): array
     {
         return [

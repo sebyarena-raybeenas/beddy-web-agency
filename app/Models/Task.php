@@ -2,18 +2,22 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsModelActivity;
 use Database\Factories\TaskFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 #[Fillable(['project_id', 'template_item_id', 'title', 'description', 'assignee_id', 'due_date', 'completed_at', 'created_by', 'sort'])]
 class Task extends Model
 {
     /** @use HasFactory<TaskFactory> */
     use HasFactory;
+
+    use LogsModelActivity;
 
     protected function casts(): array
     {
@@ -66,5 +70,10 @@ class Task extends Model
     public function reopen(): void
     {
         $this->forceFill(['completed_at' => null])->save();
+    }
+
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable')->orderByDesc('id');
     }
 }

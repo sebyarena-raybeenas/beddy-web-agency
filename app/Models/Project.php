@@ -7,6 +7,7 @@ use App\Domain\Workflow\Workflow;
 use App\Domain\Workflow\WorkflowRegistry;
 use App\Enums\Origin;
 use App\Enums\ProjectType;
+use App\Models\Concerns\LogsModelActivity;
 use Database\Factories\ProjectFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,12 +15,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Collection;
+use Spatie\Activitylog\Models\Activity;
 
 #[Fillable(['client_id', 'name', 'type', 'status', 'owner_id', 'due_date', 'primary_domain_id', 'origin', 'created_by'])]
 class Project extends Model
 {
     /** @use HasFactory<ProjectFactory> */
     use HasFactory;
+
+    use LogsModelActivity;
 
     protected $attributes = [
         'origin' => 'manuale',
@@ -113,5 +119,58 @@ class Project extends Model
     public function statusHistory(): HasMany
     {
         return $this->hasMany(ProjectStatusChange::class)->orderBy('id');
+    }
+
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable')->orderByDesc('id');
+    }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    protected function activityLogExcept(): array
+    {
+        return ['status', 'status_changed_at', 'due_date'];
+    }
+
+    /**
+     * Activity of the project and of its requirements, materials and tasks,
+     * merged with status changes, newest first.
+     *
+     * @return Collection<int, Activity|ProjectStatusChange>
+     */
+    public function timeline(): Collection
+    {
+        $subjects = [
+            [$this->getMorphClass(), [$this->getKey()]],
+            [(new ProjectRequirement)->getMorphClass(), $this->requirements()->reorder()->pluck('id')->all()],
+            [(new Material)->getMorphClass(), $this->materials()->pluck('id')->all()],
+            [(new Task)->getMorphClass(), $this->tasks()->pluck('id')->all()],
+        ];
+
+        $activities = Activity::query()
+            ->where(function ($query) use ($subjects) {
+                foreach ($subjects as [$type, $ids]) {
+                    if ($ids !== []) {
+                        $query->orWhere(fn ($q) => $q->where('subject_type', $type)->whereIn('subject_id', $ids));
+                    }
+                }
+            })
+            ->with('causer')
+            ->get();
+
+        return $activities
+            ->toBase()
+            ->concat($this->statusHistory()->reorder()->with('user')->get())
+            ->sort(function ($a, $b) {
+                $at = ($a instanceof Activity ? $a->created_at : $a->changed_at)->getTimestamp();
+                $bt = ($b instanceof Activity ? $b->created_at : $b->changed_at)->getTimestamp();
+
+                return [$bt, $b instanceof Activity ? 1 : 0, $b->getKey()] <=> [$at, $a instanceof Activity ? 1 : 0, $a->getKey()];
+            })
+            ->values();
     }
 }

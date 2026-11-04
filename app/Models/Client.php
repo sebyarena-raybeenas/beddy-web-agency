@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\HostingStatus;
 use App\Enums\Origin;
+use App\Models\Concerns\LogsModelActivity;
 use Database\Factories\ClientFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,6 +17,8 @@ class Client extends Model
 {
     /** @use HasFactory<ClientFactory> */
     use HasFactory;
+
+    use LogsModelActivity;
 
     protected $attributes = [
         'origin' => 'manuale',

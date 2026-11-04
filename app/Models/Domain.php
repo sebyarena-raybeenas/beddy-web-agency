@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\DomainOwnership;
 use App\Enums\DomainRole;
+use App\Models\Concerns\LogsModelActivity;
 use Database\Factories\DomainFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -17,6 +18,8 @@ class Domain extends Model
 {
     /** @use HasFactory<DomainFactory> */
     use HasFactory;
+
+    use LogsModelActivity;
 
     protected $attributes = [
         'role' => 'secondario',
