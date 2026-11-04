@@ -41,6 +41,10 @@ php artisan boost:install
 
 Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
 
+## Accesso demo (solo locale)
+
+Con `APP_ENV=local`, `php artisan migrate:fresh --seed` crea dati fittizi di esempio. Utente demo: `demo@example.test` / `password` (anche `collega@example.test`). La password serve solo in locale: non usarla mai in produzione.
+
 ## Contributing
 
 Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
