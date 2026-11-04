@@ -3,7 +3,6 @@
 use App\Filament\Resources\Clients\Pages\CreateClient;
 use App\Filament\Resources\Clients\Pages\EditClient;
 use App\Filament\Resources\Clients\RelationManagers\DomainsRelationManager as ClientDomains;
-use App\Filament\Resources\Projects\Pages\ViewProject;
 use App\Filament\Resources\Projects\RelationManagers\DomainsRelationManager as ProjectDomains;
 use App\Models\Client;
 use App\Models\Domain;
@@ -53,7 +52,7 @@ it('allows editing a client domain without tripping over itself', function () {
 it('rejects a duplicate domain in the project domains relation', function () {
     $project = Project::factory()->create();
 
-    Livewire::test(ProjectDomains::class, ['ownerRecord' => $project, 'pageClass' => ViewProject::class])
+    Livewire::test(ProjectDomains::class, ['ownerRecord' => $project, 'pageClass' => EditProject::class])
         ->callAction(TestAction::make('create')->table(), ['name' => 'https://WWW.Esempio.it/'])
         ->assertHasActionErrors(['name' => 'Questo dominio è già registrato']);
 

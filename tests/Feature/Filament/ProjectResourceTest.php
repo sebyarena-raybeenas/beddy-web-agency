@@ -7,7 +7,7 @@ use App\Enums\MaterialStatus;
 use App\Filament\Resources\Projects\Pages\CreateProject;
 use App\Filament\Resources\Projects\Pages\EditProject;
 use App\Filament\Resources\Projects\Pages\ListProjects;
-use App\Filament\Resources\Projects\Pages\ViewProject;
+use App\Filament\Resources\Projects\Pages\ProjectDetail;
 use App\Filament\Resources\Projects\ProjectResource;
 use App\Filament\Resources\Projects\RelationManagers\DomainsRelationManager;
 use App\Filament\Resources\Projects\RelationManagers\MaterialsRelationManager;
@@ -74,7 +74,7 @@ it('creates a nuovo project from the form with its requirements', function () {
 it('moves status with the Cambia stato action', function () {
     $project = Project::factory()->create();
 
-    Livewire::test(ViewProject::class, ['record' => $project->getRouteKey()])
+    Livewire::test(ProjectDetail::class, ['record' => $project->getRouteKey()])
         ->callAction('changeStatus', ['status' => 'in_sviluppo'])
         ->assertHasNoActionErrors();
 
@@ -102,7 +102,7 @@ it('shows a danger notification when the transition is invalid', function () {
         ->shouldReceive('change')
         ->andThrow(new InvalidTransition('Il progetto è già in questo stato'));
 
-    Livewire::test(ViewProject::class, ['record' => $project->getRouteKey()])
+    Livewire::test(ProjectDetail::class, ['record' => $project->getRouteKey()])
         ->callAction('changeStatus', ['status' => 'in_sviluppo'])
         ->assertNotified(Notification::make()->title('Il progetto è già in questo stato')->danger());
 
@@ -112,7 +112,7 @@ it('shows a danger notification when the transition is invalid', function () {
 it('rejects the automatic ready state in the form', function () {
     $project = Project::factory()->create();
 
-    Livewire::test(ViewProject::class, ['record' => $project->getRouteKey()])
+    Livewire::test(ProjectDetail::class, ['record' => $project->getRouteKey()])
         ->callAction('changeStatus', ['status' => 'pronto_da_sviluppare'])
         ->assertHasActionErrors(['status']);
 
@@ -137,7 +137,7 @@ it('ticks the requirement when material is marked as received', function () {
     $project = seededProject($this->user);
     $material = $project->materials()->where('kind', 'foto')->firstOrFail();
 
-    Livewire::test(MaterialsRelationManager::class, ['ownerRecord' => $project, 'pageClass' => ViewProject::class])
+    Livewire::test(MaterialsRelationManager::class, ['ownerRecord' => $project, 'pageClass' => EditProject::class])
         ->callAction(TestAction::make('edit')->table($material), ['status' => MaterialStatus::Ricevuto->value])
         ->assertHasNoActionErrors();
 
@@ -151,7 +151,7 @@ it('stores an uploaded file as an attachment of the material', function () {
     $material = $project->materials()->where('kind', 'foto')->firstOrFail();
     $file = UploadedFile::fake()->image('foto.jpg');
 
-    Livewire::test(MaterialsRelationManager::class, ['ownerRecord' => $project, 'pageClass' => ViewProject::class])
+    Livewire::test(MaterialsRelationManager::class, ['ownerRecord' => $project, 'pageClass' => EditProject::class])
         ->callAction(TestAction::make('edit')->table($material), ['status' => 'atteso', 'files' => [$file]])
         ->assertHasNoActionErrors();
 
@@ -164,7 +164,7 @@ it('stores an uploaded file as an attachment of the material', function () {
 it('creates a to-do and completes it', function () {
     $project = Project::factory()->create();
 
-    $livewire = Livewire::test(TasksRelationManager::class, ['ownerRecord' => $project, 'pageClass' => ViewProject::class])
+    $livewire = Livewire::test(TasksRelationManager::class, ['ownerRecord' => $project, 'pageClass' => EditProject::class])
         ->callAction(TestAction::make('create')->table(), ['title' => 'Chiamare il cliente'])
         ->assertHasNoActionErrors();
 
@@ -179,7 +179,7 @@ it('makes a domain primary from the domains relation', function () {
     $project = Project::factory()->create();
     $domain = Domain::factory()->create(['client_id' => $project->client_id, 'project_id' => $project->id]);
 
-    Livewire::test(DomainsRelationManager::class, ['ownerRecord' => $project, 'pageClass' => ViewProject::class])
+    Livewire::test(DomainsRelationManager::class, ['ownerRecord' => $project, 'pageClass' => EditProject::class])
         ->callAction(TestAction::make('makePrimary')->table($domain));
 
     expect($project->fresh()->primary_domain_id)->toBe($domain->id);
@@ -188,7 +188,7 @@ it('makes a domain primary from the domains relation', function () {
 it('handles a stale page: the state changed elsewhere is no longer selectable', function () {
     $project = Project::factory()->create();
 
-    $page = Livewire::test(ViewProject::class, ['record' => $project->getRouteKey()])
+    $page = Livewire::test(ProjectDetail::class, ['record' => $project->getRouteKey()])
         ->mountAction('changeStatus');
 
     app(ProjectStatusService::class)->change($project, 'in_sviluppo', $this->user);
@@ -205,7 +205,7 @@ it('handles a stale page: the state changed elsewhere is no longer selectable', 
 it('lets a stale page move back to the previous state through the real service', function () {
     $project = Project::factory()->create();
 
-    $page = Livewire::test(ViewProject::class, ['record' => $project->getRouteKey()])
+    $page = Livewire::test(ProjectDetail::class, ['record' => $project->getRouteKey()])
         ->mountAction('changeStatus');
 
     app(ProjectStatusService::class)->change($project, 'in_sviluppo', $this->user);
