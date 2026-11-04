@@ -58,3 +58,25 @@ it('rejects a duplicate domain in the project domains relation', function () {
 
     expect(Domain::count())->toBe(1);
 });
+
+it('refuses to associate a domain of another client to a project', function () {
+    $project = Project::factory()->create();
+    $foreign = Domain::factory()->create(['client_id' => Client::factory()->create()->id, 'project_id' => null]);
+
+    Livewire::test(ProjectDomains::class, ['ownerRecord' => $project, 'pageClass' => App\Filament\Resources\Projects\Pages\EditProject::class])
+        ->callAction(TestAction::make('associate')->table(), ['domain_id' => $foreign->id])
+        ->assertHasActionErrors(['domain_id' => 'Il dominio selezionato non appartiene al cliente di questo progetto']);
+
+    expect($foreign->fresh()->project_id)->toBeNull();
+});
+
+it('associates a free domain of the same client', function () {
+    $project = Project::factory()->create();
+    $own = Domain::factory()->create(['client_id' => $project->client_id, 'project_id' => null]);
+
+    Livewire::test(ProjectDomains::class, ['ownerRecord' => $project, 'pageClass' => App\Filament\Resources\Projects\Pages\EditProject::class])
+        ->callAction(TestAction::make('associate')->table(), ['domain_id' => $own->id])
+        ->assertHasNoActionErrors();
+
+    expect($own->fresh()->project_id)->toBe($project->id);
+});

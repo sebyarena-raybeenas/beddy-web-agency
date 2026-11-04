@@ -7,6 +7,7 @@ use App\Enums\DomainOwnership;
 use App\Enums\DomainRole;
 use App\Filament\Support\UniqueDomainName;
 use App\Models\Domain;
+use Closure;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Select;
@@ -69,9 +70,22 @@ class DomainsRelationManager extends RelationManager
                                 ->orderBy('name')
                                 ->pluck('name', 'id')
                                 ->all())
-                            ->required(),
+                            ->required()
+                            ->rules([
+                                fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                                    if (! $this->isAssociable($value)) {
+                                        $fail('Il dominio selezionato non appartiene al cliente di questo progetto');
+                                    }
+                                },
+                            ]),
                     ])
                     ->action(function (array $data): void {
+                        if (! $this->isAssociable($data['domain_id'])) {
+                            Notification::make()->title('Il dominio selezionato non appartiene al cliente di questo progetto')->danger()->send();
+
+                            return;
+                        }
+
                         Domain::findOrFail($data['domain_id'])
                             ->forceFill(['project_id' => $this->getOwnerRecord()->getKey()])
                             ->save();
@@ -95,5 +109,15 @@ class DomainsRelationManager extends RelationManager
                         Notification::make()->title('Dominio principale aggiornato')->success()->send();
                     }),
             ]);
+    }
+
+    /** The posted id is untrusted: it must be a free domain of the project's own client. */
+    private function isAssociable(mixed $domainId): bool
+    {
+        return Domain::query()
+            ->whereKey($domainId)
+            ->where('client_id', $this->getOwnerRecord()->client_id)
+            ->whereNull('project_id')
+            ->exists();
     }
 }

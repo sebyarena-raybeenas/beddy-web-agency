@@ -58,7 +58,7 @@ class Project extends Model
             $project->statusHistory()->create([
                 'from_status' => null,
                 'to_status' => $project->status,
-                'changed_by' => auth()->id(),
+                'changed_by' => $project->created_by ?? auth()->id(),
                 'changed_at' => now(),
             ]);
         });

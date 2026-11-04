@@ -45,6 +45,19 @@ class MaterialsRelationManager extends RelationManager
             FileUpload::make('files')
                 ->label('File')
                 ->multiple()
+                ->acceptedFileTypes([
+                    'image/*',
+                    'application/pdf',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.*',
+                    'application/vnd.ms-excel',
+                    'application/vnd.ms-powerpoint',
+                    'application/vnd.oasis.opendocument.*',
+                    'text/plain',
+                    'application/zip',
+                    'application/x-zip-compressed',
+                ])
+                ->maxSize(20 * 1024)
                 ->disk(Attachment::DISK)
                 ->visibility('private')
                 ->directory(fn (): string => Attachment::directoryFor($this->getOwnerRecord()->getKey()))

@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Domain\Users\DeactivationGuard;
 use App\Domain\Users\InviteUser;
+use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
@@ -18,7 +20,9 @@ class UsersTable
             ->columns([
                 TextColumn::make('name')->label('Nome')->searchable()->sortable(),
                 TextColumn::make('email')->label('Email')->searchable()->sortable(),
-                ToggleColumn::make('is_active')->label('Attivo'),
+                ToggleColumn::make('is_active')
+                    ->label('Attivo')
+                    ->rules(fn (User $record): array => ['boolean', DeactivationGuard::rule($record)]),
                 TextColumn::make('last_login_at')
                     ->label('Ultimo accesso')
                     ->dateTime('d/m/Y H:i')

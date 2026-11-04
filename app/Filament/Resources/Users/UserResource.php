@@ -18,6 +18,8 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
+    protected static ?string $slug = 'utenti';
+
     protected static ?string $modelLabel = 'utente';
 
     protected static ?string $pluralModelLabel = 'utenti';

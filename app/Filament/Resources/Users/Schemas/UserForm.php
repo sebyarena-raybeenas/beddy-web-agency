@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Domain\Users\DeactivationGuard;
+use App\Models\User;
+use Closure;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
@@ -25,6 +28,7 @@ class UserForm
                 Toggle::make('is_active')
                     ->label('Attivo')
                     ->default(true)
+                    ->rules([fn (?User $record): Closure => DeactivationGuard::rule($record ?? new User)])
                     ->visibleOn('edit'),
             ]);
     }

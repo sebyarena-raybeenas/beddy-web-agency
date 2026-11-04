@@ -43,3 +43,17 @@ it('records the authenticated user in the first history row', function () {
 
     expect($project->statusHistory->first()->changed_by)->toBe($user->id);
 });
+
+it('records the creator passed to ProjectCreator in the first history row, over the authenticated user', function () {
+    $this->seed(Database\Seeders\TemplateSeeder::class);
+    $creator = User::factory()->create();
+    $this->actingAs(User::factory()->create());
+
+    $project = app(App\Domain\Projects\ProjectCreator::class)->create([
+        'client_id' => App\Models\Client::factory()->create()->id,
+        'name' => 'Progetto',
+        'type' => 'nuovo',
+    ], $creator);
+
+    expect($project->statusHistory()->orderBy('id')->first()->changed_by)->toBe($creator->id);
+});
