@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Clients\Schemas;
 
 use App\Enums\DomainOwnership;
 use App\Enums\HostingStatus;
+use App\Filament\Support\UniqueDomainName;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -50,7 +51,7 @@ class ClientForm
                     ->columnSpanFull()
                     ->visibleOn('create')
                     ->schema([
-                        TextInput::make('name')->label('Dominio')->required()->maxLength(255),
+                        TextInput::make('name')->label('Dominio')->required()->maxLength(255)->rule(UniqueDomainName::rule()),
                         Select::make('ownership')->label('Intestazione')->options(DomainOwnership::class),
                     ]),
             ]);

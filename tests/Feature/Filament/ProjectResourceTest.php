@@ -184,3 +184,36 @@ it('makes a domain primary from the domains relation', function () {
 
     expect($project->fresh()->primary_domain_id)->toBe($domain->id);
 });
+
+it('handles a stale page: the state changed elsewhere is no longer selectable', function () {
+    $project = Project::factory()->create();
+
+    $page = Livewire::test(ViewProject::class, ['record' => $project->getRouteKey()])
+        ->mountAction('changeStatus');
+
+    app(ProjectStatusService::class)->change($project, 'in_sviluppo', $this->user);
+
+    // Real service, no mocks: the now-current state is rejected by the form, nothing changes.
+    $page->setActionData(['status' => 'in_sviluppo'])
+        ->callMountedAction()
+        ->assertHasActionErrors(['status']);
+
+    expect($project->fresh()->status)->toBe('in_sviluppo')
+        ->and($project->statusHistory()->count())->toBe(2);
+});
+
+it('lets a stale page move back to the previous state through the real service', function () {
+    $project = Project::factory()->create();
+
+    $page = Livewire::test(ViewProject::class, ['record' => $project->getRouteKey()])
+        ->mountAction('changeStatus');
+
+    app(ProjectStatusService::class)->change($project, 'in_sviluppo', $this->user);
+
+    $page->setActionData(['status' => 'in_preparazione'])
+        ->callMountedAction()
+        ->assertHasNoActionErrors();
+
+    expect($project->fresh()->status)->toBe('in_preparazione')
+        ->and($project->statusHistory()->count())->toBe(3);
+});

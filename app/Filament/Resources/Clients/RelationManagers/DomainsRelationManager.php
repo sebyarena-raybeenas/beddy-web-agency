@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Clients\RelationManagers;
 
 use App\Enums\DomainOwnership;
+use App\Filament\Support\UniqueDomainName;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -31,7 +32,7 @@ class DomainsRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema->components([
-            TextInput::make('name')->label('Dominio')->required()->maxLength(255),
+            TextInput::make('name')->label('Dominio')->required()->maxLength(255)->rule(UniqueDomainName::rule()),
             Select::make('ownership')->label('Intestazione')->options(DomainOwnership::class),
         ]);
     }
