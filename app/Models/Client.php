@@ -41,6 +41,11 @@ class Client extends Model
         return $this->hasMany(Domain::class);
     }
 
+    public function projects(): HasMany
+    {
+        return $this->hasMany(Project::class);
+    }
+
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
