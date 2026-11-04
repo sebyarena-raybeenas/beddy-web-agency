@@ -1,0 +1,112 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+:root {
+    --side: #2b2257;
+    --side2: #3a2f73;
+    --sideTxt: #c9c3ec;
+    --acc: #6c4ce0;
+    --accSoft: #efeafe;
+    --bg: #f5f6fa;
+    --card: #ffffff;
+    --ink: #1c1f2e;
+    --mute: #7a7f93;
+    --line: #eceef3;
+    --grn: #1aa37a;
+    --grnSoft: #e3f7ef;
+    --amb: #f08c00;
+    --ambSoft: #fff3e0;
+    --red: #e03e6b;
+    --redSoft: #fde7ee;
+    --blu: #2f80ed;
+    --bluSoft: #e6f0fd;
+    --vio: #8e5cf7;
+    --vioSoft: #f1eafe;
+    --gry: #8a90a2;
+    --grySoft: #eef0f4;
+    --tea: #0ea5b7;
+    --teaSoft: #e0f6f8;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* Sidebar */
+.fi-sidebar,
+.fi-sidebar-header-ctn,
+.fi-sidebar-header {
+    background-color: var(--side);
+    color: var(--sideTxt);
+}
+
+.fi-sidebar-header,
+.fi-sidebar-nav {
+    box-shadow: none;
+    --tw-ring-shadow: 0 0 #0000;
+}
+
+.fi-sidebar-header .fi-logo,
+.fi-sidebar-header a,
+.fi-sidebar-header-logo-ctn {
+    color: #fff;
+    font-weight: 800;
+}
+
+.fi-sidebar-item-btn,
+.fi-sidebar-item-label,
+.fi-sidebar-item-icon,
+.fi-sidebar-group-label,
+.fi-sidebar-group-btn .fi-icon {
+    color: var(--sideTxt);
+}
+
+.fi-sidebar-item-btn {
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.fi-sidebar-item-btn:hover {
+    background-color: var(--side2);
+}
+
+.fi-sidebar-item-btn:hover .fi-sidebar-item-label,
+.fi-sidebar-item-btn:hover .fi-sidebar-item-icon {
+    color: #fff;
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background-color: #fff;
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-icon {
+    color: var(--side);
+    font-weight: 700;
+}
+
+.fi-sidebar-group-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8f87c4;
+}
+
+/* Cards and surfaces */
+.fi-body {
+    background-color: var(--bg);
+}
+
+.fi-section,
+.fi-ta-ctn,
+.fi-wi-stats-overview-stat,
+.fi-fo-tabs {
+    border-radius: 16px;
+}
+
+.fi-btn {
+    border-radius: 10px;
+    font-weight: 700;
+}
