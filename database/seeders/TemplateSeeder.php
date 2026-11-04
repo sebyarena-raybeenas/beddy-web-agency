@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ChecklistTemplate;
 use App\Models\RequirementTemplate;
 use Illuminate\Database\Seeder;
 
@@ -26,6 +27,27 @@ class TemplateSeeder extends Seeder
                 ['flow' => $flow, 'label' => $label],
                 ['is_mandatory' => true, 'material_kind' => $kind, 'sort' => $sort],
             );
+        }
+
+        $this->seedGoLiveChecklist();
+    }
+
+    private function seedGoLiveChecklist(): void
+    {
+        $checklist = ChecklistTemplate::updateOrCreate(
+            ['flow' => 'sito', 'name' => 'Messa online'],
+            ['trigger_status' => 'in_pubblicazione'],
+        );
+
+        $titles = [
+            'Responsive', 'Traduzioni', 'Robots', 'Sitemap', 'Search Console', 'Analytics',
+            'Recaptcha', 'Wordfence', 'Cache', 'Disabilitare sitemap SEO Yoast', 'Cambio password',
+            'Rimozione plugin', 'Codice WPML', 'Contact form', '404', 'Google Business',
+            'Redirect vecchio sito',
+        ];
+
+        foreach ($titles as $index => $title) {
+            $checklist->items()->updateOrCreate(['title' => $title], ['sort' => $index + 1]);
         }
     }
 }
