@@ -233,6 +233,26 @@ it('rejects a disallowed file type on a material upload', function () {
     expect($material->attachments()->count())->toBe(0);
 });
 
+it('accepts office and odf documents on a material upload', function (string $name, string $mime) {
+    Storage::fake(Attachment::DISK);
+    $project = seededProject($this->user);
+    $material = $project->materials()->where('kind', 'testi')->firstOrFail();
+    $file = UploadedFile::fake()->create($name, 10, $mime);
+
+    Livewire::test(MaterialsRelationManager::class, ['ownerRecord' => $project, 'pageClass' => EditProject::class])
+        ->callAction(TestAction::make('edit')->table($material), ['status' => 'atteso', 'files' => [$file]])
+        ->assertHasNoActionErrors();
+
+    expect($material->attachments()->value('filename'))->toBe($name);
+})->with([
+    'docx' => ['testi.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+    'xlsx' => ['listino.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+    'pptx' => ['presentazione.pptx', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'],
+    'odt' => ['testi.odt', 'application/vnd.oasis.opendocument.text'],
+    'ods' => ['listino.ods', 'application/vnd.oasis.opendocument.spreadsheet'],
+    'odp' => ['presentazione.odp', 'application/vnd.oasis.opendocument.presentation'],
+]);
+
 it('allows material uploads up to the 20 MB limit at the Livewire layer too', function () {
     expect(config('livewire.temporary_file_upload.rules'))->toContain('max:20480');
 });
