@@ -2,6 +2,7 @@
 
 @import './projects-board.css';
 @import './projects-detail.css';
+@import './clients-index.css';
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
