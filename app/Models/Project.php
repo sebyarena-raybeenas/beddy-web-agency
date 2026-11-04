@@ -71,6 +71,11 @@ class Project extends Model
         return app(WorkflowRegistry::class)->for($this->type);
     }
 
+    public function detailUrl(): string
+    {
+        return url('/progetti/'.$this->id);
+    }
+
     public function statusLabel(): string
     {
         return $this->workflow()->label($this->status);
