@@ -4,7 +4,7 @@
 .pd-grow { flex: 1; }
 .pd-crumb { font-size: 13px; color: var(--mute); margin-bottom: 14px; }
 .pd-crumb a, .pd-lnk { color: var(--acc); font-weight: 700; }
-.pd-alert { display: flex; gap: 10px; align-items: center; background: var(--bluSoft); color: #1d5fbf; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; font-weight: 600; font-size: 13.5px; }
+.pd-alert, .bw-alert { display: flex; gap: 10px; align-items: center; background: var(--bluSoft); color: #1d5fbf; border: 3px dashed currentColor; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; font-weight: 600; font-size: 13.5px; }
 .pd-hero { overflow: hidden; margin-bottom: 20px; }
 .pd-cover { height: 120px; background: linear-gradient(120deg, #2b2257 0%, #6c4ce0 55%, #b89cff 100%); position: relative; }
 .pd-shot { position: absolute; right: 28px; bottom: -40px; width: 210px; height: 130px; border-radius: 12px; background: #fff; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18); padding: 10px; }
@@ -90,3 +90,8 @@
 
 @media (max-width: 900px) { .pd-grid { grid-template-columns: 1fr; } .pd-hmeta { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 760px) { .pd-shot { display: none; } }
+
+/* Completed to-dos stay in the list, ticked and struck through, and can be reopened. */
+.pd-chk.pd-done .pd-t { text-decoration: line-through; text-decoration-thickness: 2px; color: var(--mute); }
+.pd-chk.pd-done .pd-r { opacity: 0.6; }
+.pd-box > h3 + .pd-group { margin-top: 0; }

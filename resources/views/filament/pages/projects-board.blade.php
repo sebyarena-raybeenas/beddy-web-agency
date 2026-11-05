@@ -55,7 +55,7 @@
                     <div class="pb-col">
                         <h4><span class="pb-pill {{ $col['pill'] }}">{{ $col['label'] }}</span><em>{{ $col['projects']->count() }}</em></h4>
                         @foreach ($col['projects'] as $p)
-                            <a href="{{ $p->detailUrl() }}" class="pb-card pb-kc" style="border-bottom-color:{{ $col['color'] }}">
+                            <a href="{{ $p->detailUrl() }}" class="pb-card pb-kc {{ $p->markClasses() }}" style="border-bottom-color:{{ $col['color'] }}">
                                 <span class="pb-tag" style="background:color-mix(in srgb, {{ ProjectsBoard::typeColor($p->type) }} 13%, transparent);color:{{ ProjectsBoard::typeColor($p->type) }}">{{ $p->type->label() }}</span>
                                 <h5>{{ $p->client->name }}</h5>
                                 <p>{{ $p->name }}</p>

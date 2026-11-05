@@ -17,8 +17,8 @@ class ClientContactFactory extends Factory
             'client_id' => Client::factory(),
             'name' => fake()->name(),
             'role' => fake()->jobTitle(),
-            'phone' => fake()->phoneNumber(),
-            'email' => fake()->unique()->safeEmail(),
+            'phones' => [fake()->phoneNumber()],
+            'emails' => [fake()->unique()->safeEmail()],
             'is_primary' => false,
         ];
     }

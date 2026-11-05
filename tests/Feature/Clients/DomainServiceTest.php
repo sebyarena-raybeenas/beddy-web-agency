@@ -51,3 +51,30 @@ it('rejects a domain assigned to another project', function () {
     expect(fn () => app(DomainService::class)->setPrimary($project, $domain))
         ->toThrow(ValidationException::class);
 });
+
+it('makes a domain the client principale and keeps projects consistent', function () {
+    $project = Project::factory()->create();
+    $client = $project->client;
+    $old = Domain::factory()->for($client)->create(['role' => DomainRole::Principale, 'project_id' => $project->id]);
+    $new = Domain::factory()->for($client)->create(['project_id' => $project->id]);
+    $foreign = Domain::factory()->create(['role' => DomainRole::Principale]);
+    $project->update(['primary_domain_id' => $old->id]);
+
+    app(DomainService::class)->makeClientPrimary($new);
+
+    expect($new->fresh()->role)->toBe(DomainRole::Principale)
+        ->and($old->fresh()->role)->toBe(DomainRole::Secondario)
+        ->and($foreign->fresh()->role)->toBe(DomainRole::Principale)
+        ->and($project->fresh()->primary_domain_id)->toBe($new->id);
+});
+
+it('clears the project primary when its domain becomes secondario', function () {
+    $project = Project::factory()->create();
+    $domain = Domain::factory()->for($project->client)->create(['role' => DomainRole::Principale, 'project_id' => $project->id]);
+    $project->update(['primary_domain_id' => $domain->id]);
+
+    app(DomainService::class)->makeSecondary($domain);
+
+    expect($domain->fresh()->role)->toBe(DomainRole::Secondario)
+        ->and($project->fresh()->primary_domain_id)->toBeNull();
+});

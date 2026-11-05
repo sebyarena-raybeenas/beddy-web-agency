@@ -114,3 +114,19 @@ body {
     border-radius: 10px;
     font-weight: 700;
 }
+
+/* Visual marks: modifica projects get light diagonal stripes; a large faint icon tells pencil (modifica) from feedback. */
+.bw-mark-modifica,
+.bw-mark-pencil,
+.bw-mark-feedback {
+    --bw-stripes: none;
+    --bw-icon: none;
+    background-color: var(--card);
+    background-image: var(--bw-icon), var(--bw-stripes);
+    background-repeat: no-repeat, repeat;
+    background-position: right -14px bottom -14px, 0 0;
+    background-size: 150px 150px, auto;
+}
+.bw-mark-modifica { --bw-stripes: repeating-linear-gradient(135deg, transparent 0 16px, rgba(122, 127, 147, 0.07) 16px 26px); }
+.bw-mark-pencil { --bw-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none' stroke='%236c4ce0' stroke-opacity='.16' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M44 7l13 13-34 34H10V41z'/%3E%3Cpath d='M37 14l13 13'/%3E%3Cpath d='M10 41l13 13'/%3E%3C/svg%3E"); }
+.bw-mark-feedback { --bw-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none' stroke='%23f08c00' stroke-opacity='.24' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 6h30a4 4 0 0 1 4 4v17a4 4 0 0 1-4 4H19l-8 7v-7H7a4 4 0 0 1-4-4V10a4 4 0 0 1 4-4z'/%3E%3Cpath d='M10 14h18M10 20h14M10 26h8'/%3E%3Cpath d='M55 4l5 5-21 21-7 2 2-7z'/%3E%3Cpath d='M29 36h27a4 4 0 0 1 4 4v13a4 4 0 0 1-4 4h-3v6l-7-6H29a4 4 0 0 1-4-4V40a4 4 0 0 1 4-4z'/%3E%3Cpath d='M35 53v-8h3l4-6c2 0 3 1.2 2.6 3.2L44 45h6a2 2 0 0 1 2 2.4l-1.2 4.4a2 2 0 0 1-2 1.2z'/%3E%3C/svg%3E"); }

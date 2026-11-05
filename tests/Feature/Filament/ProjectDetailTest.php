@@ -35,7 +35,7 @@ function reqFor(Project $project, string $label, bool $done = false, int $sort =
 it('renders at the project route with hero, client box and discussion', function () {
     $client = Client::factory()->create(['name' => 'Hotel Rossi']);
     $project = Project::factory()->create(['client_id' => $client->id, 'name' => 'Sito Rossi', 'owner_id' => $this->user->id]);
-    $client->contacts()->create(['name' => 'Giulia Ferri', 'phone' => '333 111', 'email' => 'g@rossi.it', 'is_primary' => true]);
+    $client->contacts()->create(['name' => 'Giulia Ferri', 'phones' => ['333 111', '06 222'], 'emails' => ['g@rossi.it'], 'is_primary' => true]);
 
     $this->get($project->detailUrl())->assertOk()->assertSee('Sito Rossi')->assertSee('Hotel Rossi');
 
@@ -43,6 +43,9 @@ it('renders at the project route with hero, client box and discussion', function
         ->assertSee('Sito Rossi')
         ->assertSee('Hotel Rossi')
         ->assertSee('Giulia Ferri')
+        ->assertSee('333 111')
+        ->assertSee('06 222')
+        ->assertSee('g@rossi.it')
         ->assertSee('Discussione del team')
         ->assertSee('Attività recente')
         ->assertSee('Modifica');
@@ -210,17 +213,33 @@ it('rejects a task without a title or with an invalid assignee', function () {
     expect($project->tasks()->count())->toBe(0);
 });
 
-it('toggles a task and splits open and completed tabs', function () {
+it('keeps a completed task visible, struck through, and lets it be reopened', function () {
     $project = Project::factory()->create();
     $task = Task::factory()->create(['project_id' => $project->id, 'title' => 'Home page']);
+    Task::factory()->create(['project_id' => $project->id, 'title' => 'Contatti']);
 
-    $page = detail($project)->assertSeeHtml("task-{$task->id}")->call('toggleTask', $task->id);
+    $page = detail($project)->assertSeeHtml("task-{$task->id}")->assertSee('0 / 2 completati');
+
+    $page->call('toggleTask', $task->id);
     expect($task->fresh()->completed_at)->not->toBeNull();
-
-    $page->assertDontSeeHtml("task-{$task->id}")->set('tab', 'completati')->assertSeeHtml("task-{$task->id}");
+    $page->assertSeeHtml("task-{$task->id}")->assertSeeHtml('pd-done')->assertSee('1 / 2 completati');
 
     $page->call('toggleTask', $task->id);
     expect($task->fresh()->completed_at)->toBeNull();
+    $page->assertDontSeeHtml('pd-done')->assertSee('0 / 2 completati');
+});
+
+it('marks modifica and feedback projects with a background', function () {
+    $modifica = Project::factory()->create(['type' => ProjectType::Modifica]);
+    $feedback = Project::factory()->create(['status' => 'feedback_modifiche']);
+    $nuovo = Project::factory()->create();
+
+    detail($modifica)->assertSeeHtml('bw-mark-modifica')->assertSeeHtml('bw-mark-pencil');
+    detail($feedback)->assertSeeHtml('bw-mark-feedback')->assertDontSeeHtml('bw-mark-pencil');
+    detail($nuovo)->assertDontSeeHtml('bw-mark-');
+
+    $modifica->update(['status' => 'feedback_altre_modifiche']);
+    expect($modifica->fresh()->markClasses())->toBe('bw-mark-modifica bw-mark-feedback');
 });
 
 it('refuses to toggle a task of another project', function () {

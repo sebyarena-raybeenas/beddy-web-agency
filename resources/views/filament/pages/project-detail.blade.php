@@ -16,7 +16,7 @@
 
         <div class="pd-card pd-hero">
             <div class="pd-cover"><div class="pd-shot"><div class="b1"></div><div class="b2"></div><div class="b3"><i></i><i></i><i></i></div></div></div>
-            <div class="pd-hbody">
+            <div class="pd-hbody {{ $project->markClasses() }}">
                 <h2>{{ $project->name }}</h2>
                 <div class="pd-by">Cliente <a href="{{ $clientUrl }}" class="pd-lnk">{{ $project->client->name }}</a> · creato{{ $project->creator ? ' da '.$project->creator->name : '' }} il {{ $project->created_at->format('d/m/Y') }} · <span class="pd-tag">{{ $project->origin->label() }}</span></div>
                 <div class="pd-hact">
@@ -97,13 +97,10 @@
 
                 {{-- To-do --}}
                 <div class="pd-card pd-box">
-                    <div class="pd-tabs">
-                        <button type="button" wire:click="$set('tab', 'aperti')" @class(['on' => $tab !== 'completati'])>Aperti ({{ $openCount }})</button>
-                        <button type="button" wire:click="$set('tab', 'completati')" @class(['on' => $tab === 'completati'])>Completati ({{ $completedCount }})</button>
-                    </div>
+                    <h3>To-do <span @class(['pb-pill', 'p-ready' => $tasksTotal > 0 && $openCount === 0, 'p-prep' => $openCount > 0 || $tasksTotal === 0])>{{ $completedCount }} / {{ $tasksTotal }} completati</span><span class="pd-grow"></span><small>{{ $openCount }} da fare</small></h3>
 
                     @if ($checklist->isNotEmpty())
-                        <div class="pd-group">Messa online <small>{{ $checklist->count() }} {{ $tab === 'completati' ? 'completati' : 'da fare' }}</small></div>
+                        <div class="pd-group">Messa online <small>{{ $checklist->whereNull('completed_at')->count() }} da fare su {{ $checklist->count() }}</small></div>
                         @foreach ($checklist as $task)
                             @include('filament.pages.partials.project-task', ['task' => $task])
                         @endforeach
@@ -117,7 +114,7 @@
                     @endforeach
 
                     @if ($shown->isEmpty() && $checklist->isEmpty())
-                        <div class="pd-empty">{{ $tab === 'completati' ? 'Nessun to-do completato' : 'Nessun to-do aperto' }}</div>
+                        <div class="pd-empty">Nessun to-do</div>
                     @endif
 
                     <div class="pd-add" x-data="{ title: '', assignee: '', due: '' }">
@@ -158,8 +155,8 @@
                 <div class="pd-card pd-box">
                     <h3>Cliente</h3>
                     <div class="pd-kv"><span>Referente</span><b>{{ $contact?->name ?? '—' }}</b></div>
-                    <div class="pd-kv"><span>Telefono</span><b>{{ $contact?->phone ?: '—' }}</b></div>
-                    <div class="pd-kv"><span>Email</span><b>{{ $contact?->email ?: '—' }}</b></div>
+                    <div class="pd-kv"><span>Telefoni</span><b>@forelse (array_filter($contact?->phones ?? []) as $phone){{ $phone }}@unless ($loop->last)<br>@endunless @empty — @endforelse</b></div>
+                    <div class="pd-kv"><span>Email</span><b>@forelse (array_filter($contact?->emails ?? []) as $email){{ $email }}@unless ($loop->last)<br>@endunless @empty — @endforelse</b></div>
                     <div class="pd-kv"><span>Assistenza</span><b @style(['color:var(--grn)' => $project->client->has_assistance])>{{ $project->client->has_assistance ? 'Sì'.($project->client->assistance_type ? ', '.$project->client->assistance_type : '') : 'No' }}</b></div>
                     <div class="pd-kv"><span>Dominio</span><b>{{ $project->primaryDomain ? $project->primaryDomain->name.($project->primaryDomain->ownership ? ' · '.$project->primaryDomain->ownership->label() : '') : '—' }}</b></div>
                     <div class="pd-kv"><span>Hosting</span><b>{{ $project->client->hosting_status?->label() ?? '—' }}</b></div>

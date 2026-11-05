@@ -3,8 +3,10 @@
 namespace App\Filament\Resources\Clients\Schemas;
 
 use App\Enums\DomainOwnership;
+use App\Enums\DomainRole;
 use App\Enums\HostingStatus;
 use App\Filament\Support\UniqueDomainName;
+use Closure;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -36,13 +38,7 @@ class ClientForm
                     ->columns(2)
                     ->columnSpanFull()
                     ->visibleOn('create')
-                    ->schema([
-                        TextInput::make('name')->label('Nome')->required()->maxLength(255),
-                        TextInput::make('role')->label('Ruolo')->maxLength(255),
-                        TextInput::make('phone')->label('Telefono')->tel()->maxLength(255),
-                        TextInput::make('email')->label('Email')->email()->maxLength(255),
-                        Toggle::make('is_primary')->label('Contatto principale'),
-                    ]),
+                    ->schema(ContactFields::schema()),
                 Repeater::make('domains')
                     ->label('Domini')
                     ->relationship()
@@ -50,9 +46,23 @@ class ClientForm
                     ->columns(2)
                     ->columnSpanFull()
                     ->visibleOn('create')
+                    ->rule(fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                        $primaries = collect((array) $value)
+                            ->filter(fn ($item): bool => ($item['role'] ?? null) === DomainRole::Principale->value);
+
+                        if ($primaries->count() > 1) {
+                            $fail('Un solo dominio può essere principale.');
+                        }
+                    })
                     ->schema([
                         TextInput::make('name')->label('Dominio')->required()->maxLength(255)->rule(UniqueDomainName::rule()),
                         Select::make('ownership')->label('Intestazione')->options(DomainOwnership::class),
+                        Select::make('role')
+                            ->label('Ruolo')
+                            ->options(DomainRole::class)
+                            ->default(DomainRole::Secondario->value)
+                            ->selectablePlaceholder(false)
+                            ->required(),
                     ]),
             ]);
     }

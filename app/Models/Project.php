@@ -163,6 +163,30 @@ class Project extends Model
     /** Days after which an awaited material counts as late. */
     public const LATE_MATERIAL_DAYS = 7;
 
+    /** States in which the client asked for changes after seeing the work. */
+    public const FEEDBACK_STATES = ['feedback_modifiche', 'feedback_altre_modifiche'];
+
+    /**
+     * CSS classes that mark the project visually: stripes for a modifica project,
+     * plus a watermark icon (feedback after a client review, otherwise a pencil for modifica).
+     */
+    public function markClasses(): string
+    {
+        $classes = [];
+
+        if ($this->type === ProjectType::Modifica) {
+            $classes[] = 'bw-mark-modifica';
+        }
+
+        if (in_array($this->status, self::FEEDBACK_STATES, true)) {
+            $classes[] = 'bw-mark-feedback';
+        } elseif ($this->type === ProjectType::Modifica) {
+            $classes[] = 'bw-mark-pencil';
+        }
+
+        return implode(' ', $classes);
+    }
+
     /** Last instant at which a request is already late, relative to the given day. */
     public static function lateMaterialThreshold(?CarbonInterface $today = null): CarbonInterface
     {

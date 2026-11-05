@@ -1,6 +1,6 @@
 @php($done = $task->completed_at !== null)
-<div class="pd-chk" wire:key="task-{{ $task->id }}">
-    <button type="button" wire:click="toggleTask({{ $task->id }})" @class(['pd-cb', 'ok' => $done]) title="{{ $done ? 'Riapri' : 'Completa' }}">{{ $done ? '✓' : '' }}</button>
+<div @class(['pd-chk', 'pd-done' => $done]) wire:key="task-{{ $task->id }}">
+    <button type="button" wire:click="toggleTask({{ $task->id }})" @class(['pd-cb', 'ok' => $done]) title="{{ $done ? 'Ripristina come da fare' : 'Segna come completato' }}">{{ $done ? '✓' : '' }}</button>
     <div class="pd-t">{{ $task->title }}</div>
     <div class="pd-r">
         @if ($task->due_date)

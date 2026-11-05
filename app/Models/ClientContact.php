@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['client_id', 'name', 'role', 'phone', 'email', 'is_primary'])]
+#[Fillable(['client_id', 'name', 'role', 'phones', 'emails', 'is_primary'])]
 class ClientContact extends Model
 {
     /** @use HasFactory<ClientContactFactory> */
@@ -20,7 +20,11 @@ class ClientContact extends Model
 
     protected function casts(): array
     {
-        return ['is_primary' => 'boolean'];
+        return [
+            'is_primary' => 'boolean',
+            'phones' => 'array',
+            'emails' => 'array',
+        ];
     }
 
     protected static function booted(): void

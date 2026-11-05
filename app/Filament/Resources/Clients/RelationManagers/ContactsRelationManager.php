@@ -2,11 +2,10 @@
 
 namespace App\Filament\Resources\Clients\RelationManagers;
 
+use App\Filament\Resources\Clients\Schemas\ContactFields;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -30,13 +29,7 @@ class ContactsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema->components([
-            TextInput::make('name')->label('Nome')->required()->maxLength(255),
-            TextInput::make('role')->label('Ruolo')->maxLength(255),
-            TextInput::make('phone')->label('Telefono')->tel()->maxLength(255),
-            TextInput::make('email')->label('Email')->email()->maxLength(255),
-            Toggle::make('is_primary')->label('Contatto principale'),
-        ]);
+        return $schema->components(ContactFields::schema());
     }
 
     public function table(Table $table): Table
@@ -46,8 +39,8 @@ class ContactsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('name')->label('Nome')->searchable(),
                 TextColumn::make('role')->label('Ruolo'),
-                TextColumn::make('phone')->label('Telefono'),
-                TextColumn::make('email')->label('Email'),
+                TextColumn::make('phones')->label('Telefoni')->listWithLineBreaks()->placeholder('—'),
+                TextColumn::make('emails')->label('Email')->listWithLineBreaks()->placeholder('—'),
                 IconColumn::make('is_primary')->label('Principale')->boolean(),
             ])
             ->headerActions([CreateAction::make()])

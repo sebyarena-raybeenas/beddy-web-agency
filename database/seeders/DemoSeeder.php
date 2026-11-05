@@ -55,8 +55,8 @@ class DemoSeeder extends Seeder
                 'client_id' => $clients[$name]->id,
                 'name' => 'Referente '.$name,
                 'role' => 'Titolare',
-                'phone' => '+39 000 0000000',
-                'email' => 'info@'.str($name)->slug().'.test',
+                'phones' => ['+39 000 0000000', '+39 000 1111111'],
+                'emails' => ['info@'.str($name)->slug().'.test', 'amministrazione@'.str($name)->slug().'.test'],
                 'is_primary' => true,
             ]);
         }

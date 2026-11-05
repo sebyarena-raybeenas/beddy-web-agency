@@ -36,9 +36,6 @@ class ProjectDetail extends Page
 
     protected ?string $heading = '';
 
-    /** aperti | completati */
-    public string $tab = 'aperti';
-
     public function mount(int|string $record): void
     {
         $this->record = $this->resolveRecord($record);
@@ -180,8 +177,9 @@ class ProjectDetail extends Page
         $workflow = $project->workflow();
         $trigger = $workflow->checklistTrigger();
 
-        [$completed, $open] = $project->tasks->sortBy('sort')->partition(fn (Task $t) => $t->completed_at !== null);
-        $shown = $this->tab === 'completati' ? $completed : $open;
+        // Every to-do stays visible in a stable order: a completed one can be reopened in place.
+        $shown = $project->tasks->sortBy([['sort', 'asc'], ['id', 'asc']])->values();
+        [$completed, $open] = $shown->partition(fn (Task $t) => $t->completed_at !== null);
 
         $isChecklist = fn (Task $t): bool => $trigger !== null && $t->templateItem?->template?->trigger_status === $trigger;
 

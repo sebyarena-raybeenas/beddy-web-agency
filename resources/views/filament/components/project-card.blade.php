@@ -9,7 +9,7 @@
     $tasksDone = $project->tasks_done_count ?? 0;
     $pct = $tasksTotal > 0 ? (int) round($tasksDone / $tasksTotal * 100) : 0;
 @endphp
-<a href="{{ $project->detailUrl() }}" class="pb-card pb-pc">
+<a href="{{ $project->detailUrl() }}" class="pb-card pb-pc {{ $project->markClasses() }}">
     <div class="pb-hd">
         <div class="pb-tt" style="border-color:{{ ProjectsBoard::typeColor($project->type) }}">
             <h3>{{ $project->client->name }}</h3>
