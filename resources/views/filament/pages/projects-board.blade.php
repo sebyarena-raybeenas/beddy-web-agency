@@ -56,9 +56,9 @@
                         <h4><span class="pb-pill {{ $col['pill'] }}">{{ $col['label'] }}</span><em>{{ $col['projects']->count() }}</em></h4>
                         @foreach ($col['projects'] as $p)
                             <a href="{{ $p->detailUrl() }}" class="pb-card pb-kc {{ $p->markClasses() }}" style="border-bottom-color:{{ $col['color'] }}">
-                                <span class="pb-tag" style="background:color-mix(in srgb, {{ ProjectsBoard::typeColor($p->type) }} 13%, transparent);color:{{ ProjectsBoard::typeColor($p->type) }}">{{ $p->type->label() }}</span>
-                                <h5>{{ $p->client->name }}</h5>
-                                <p>{{ $p->name }}</p>
+                                <h5>{{ $p->name }}</h5>
+                                <p>{{ $p->client->name }}</p>
+                                <span class="pb-tag pb-type" style="background:color-mix(in srgb, {{ ProjectsBoard::typeColor($p->type) }} 13%, transparent);color:{{ ProjectsBoard::typeColor($p->type) }}">{{ $p->type->label() }}</span>
                                 <x-beddy::requirement-ticks :project="$p" />
                                 <div class="pb-row" style="margin-top:10px">
                                     @if ($p->owner)
@@ -76,7 +76,7 @@
         @elseif ($viewMode === 'list')
             <div class="pb-card" style="overflow-x:auto">
                 <table class="pb-table">
-                    <tr><th>Cliente / progetto</th><th>Tipo</th><th>Stato</th><th>Requisiti</th><th>To-do</th><th>Responsabile</th><th>Scadenza</th><th>Avvisi</th></tr>
+                    <tr><th>Progetto / cliente</th><th>Tipo</th><th>Stato</th><th>Requisiti</th><th>To-do</th><th>Responsabile</th><th>Scadenza</th><th>Avvisi</th></tr>
                     @forelse ($projects as $p)
                         @php
                             $overdue = $p->isOverdue();
@@ -84,7 +84,7 @@
                             $pct = $p->tasks_count > 0 ? (int) round($p->tasks_done_count / $p->tasks_count * 100) : 0;
                         @endphp
                         <tr class="pb-tr">
-                            <td><a href="{{ $p->detailUrl() }}"><b>{{ $p->client->name }}</b><div class="pb-sub">{{ $p->name }}</div></a></td>
+                            <td><a href="{{ $p->detailUrl() }}"><b>{{ $p->name }}</b><div class="pb-sub">{{ $p->client->name }}</div></a></td>
                             <td>{{ $p->type->label() }}</td>
                             <td><span class="pb-pill {{ ProjectsBoard::pill($p->status) }}">{{ $p->statusLabel() }}</span></td>
                             <td style="min-width:120px"><x-beddy::requirement-ticks :project="$p" /></td>

@@ -65,3 +65,8 @@
 .pb-ft span { color: var(--mute); display: block; }
 .pb-ft b { font-weight: 700; color: var(--ink); }
 .pb-ft .pb-tag { display: inline-block; color: #5b6275; }
+
+/* The project type always sits on its own line, under the project and client names. */
+.pb-tag.pb-type { display: table; margin-top: 6px; }
+.pb-kc p { margin-bottom: 0; }
+.pb-kc .pb-type { margin-bottom: 10px; }

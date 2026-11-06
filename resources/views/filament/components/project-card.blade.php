@@ -12,8 +12,9 @@
 <a href="{{ $project->detailUrl() }}" class="pb-card pb-pc {{ $project->markClasses() }}">
     <div class="pb-hd">
         <div class="pb-tt" style="border-color:{{ ProjectsBoard::typeColor($project->type) }}">
-            <h3>{{ $project->client->name }}</h3>
-            <div class="pb-cl">{{ $project->name }} · {{ $project->type->label() }}</div>
+            <h3>{{ $project->name }}</h3>
+            <div class="pb-cl">{{ $project->client->name }}</div>
+            <span class="pb-tag pb-type" style="background:color-mix(in srgb, {{ ProjectsBoard::typeColor($project->type) }} 13%, transparent);color:{{ ProjectsBoard::typeColor($project->type) }}">{{ $project->type->label() }}</span>
         </div>
         <span class="pb-pill {{ ProjectsBoard::pill($project->status) }}">{{ $project->statusLabel() }}</span>
     </div>
