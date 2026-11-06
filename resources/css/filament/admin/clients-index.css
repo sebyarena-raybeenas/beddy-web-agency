@@ -1,0 +1,14 @@
+/* Clienti: ported from .cgrid / .cc of docs/design/demo-grafica-v2.html */
+.cl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+.cl-cc { padding: 18px 20px; }
+.cl-hd { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+.cl-lg { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; color: #fff; font-size: 16px; flex: none; }
+.cl-cc h3 { margin: 0; font-size: 15px; font-weight: 800; color: var(--ink); }
+.cl-kv { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--line); font-size: 13px; }
+.cl-kv:last-child { border: 0; }
+.cl-kv span { color: var(--mute); }
+.cl-kv b { text-align: right; color: var(--ink); }
+.cl-link { color: var(--acc); }
+.cl-st { display: inline-block; margin-left: 6px; font-size: 12px; font-weight: 600; }
+.pb-tag.cl-asana { background: #fde8ef; color: #d6336c; }
+.pb-tag.cl-man { background: var(--teaSoft); color: var(--tea); }

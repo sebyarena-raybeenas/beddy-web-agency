@@ -1,0 +1,133 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@import './projects-board.css';
+@import './projects-detail.css';
+@import './clients-index.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+:root {
+    --side: #2b2257;
+    --side2: #3a2f73;
+    --sideTxt: #c9c3ec;
+    --acc: #6c4ce0;
+    --accSoft: #efeafe;
+    --bg: #f5f6fa;
+    --card: #ffffff;
+    --ink: #1c1f2e;
+    --mute: #7a7f93;
+    --line: #eceef3;
+    --grn: #1aa37a;
+    --grnSoft: #e3f7ef;
+    --amb: #f08c00;
+    --ambSoft: #fff3e0;
+    --red: #e03e6b;
+    --redSoft: #fde7ee;
+    --blu: #2f80ed;
+    --bluSoft: #e6f0fd;
+    --vio: #8e5cf7;
+    --vioSoft: #f1eafe;
+    --gry: #8a90a2;
+    --grySoft: #eef0f4;
+    --tea: #0ea5b7;
+    --teaSoft: #e0f6f8;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* Sidebar */
+.fi-sidebar,
+.fi-sidebar-header-ctn,
+.fi-sidebar-header {
+    background-color: var(--side);
+    color: var(--sideTxt);
+}
+
+.fi-sidebar-header,
+.fi-sidebar-nav {
+    box-shadow: none;
+    --tw-ring-shadow: 0 0 #0000;
+}
+
+.fi-sidebar-header .fi-logo,
+.fi-sidebar-header a,
+.fi-sidebar-header-logo-ctn {
+    color: #fff;
+    font-weight: 800;
+}
+
+.fi-sidebar-item-btn,
+.fi-sidebar-item-label,
+.fi-sidebar-item-icon,
+.fi-sidebar-group-label,
+.fi-sidebar-group-btn .fi-icon {
+    color: var(--sideTxt);
+}
+
+.fi-sidebar-item-btn {
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.fi-sidebar-item-btn:hover {
+    background-color: var(--side2);
+}
+
+.fi-sidebar-item-btn:hover .fi-sidebar-item-label,
+.fi-sidebar-item-btn:hover .fi-sidebar-item-icon {
+    color: #fff;
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background-color: #fff;
+}
+
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-label,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-icon {
+    color: var(--side);
+    font-weight: 700;
+}
+
+.fi-sidebar-group-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8f87c4;
+}
+
+/* Cards and surfaces */
+.fi-body {
+    background-color: var(--bg);
+}
+
+.fi-section,
+.fi-ta-ctn,
+.fi-wi-stats-overview-stat,
+.fi-fo-tabs {
+    border-radius: 16px;
+}
+
+.fi-btn {
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+/* Visual marks: modifica projects have a very light grey background, feedback ones a very light warm one;
+   a large faint icon tells pencil (modifica) from feedback. Feedback wins when both apply. */
+.bw-mark-modifica,
+.bw-mark-pencil,
+.bw-mark-feedback {
+    --bw-icon: none;
+    background-color: var(--card);
+    background-image: var(--bw-icon);
+    background-repeat: no-repeat;
+    background-position: right -14px bottom -14px;
+    background-size: 150px 150px;
+}
+.bw-mark-modifica { background-color: #f3f4f7; border-color: #e3e5eb; }
+.bw-mark-feedback { background-color: #fff7ea; border-color: #f8e4c4; }
+.bw-mark-pencil { --bw-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none' stroke='%236c4ce0' stroke-opacity='.16' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M44 7l13 13-34 34H10V41z'/%3E%3Cpath d='M37 14l13 13'/%3E%3Cpath d='M10 41l13 13'/%3E%3C/svg%3E"); }
+.bw-mark-feedback { --bw-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none' stroke='%23f08c00' stroke-opacity='.24' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 6h30a4 4 0 0 1 4 4v17a4 4 0 0 1-4 4H19l-8 7v-7H7a4 4 0 0 1-4-4V10a4 4 0 0 1 4-4z'/%3E%3Cpath d='M10 14h18M10 20h14M10 26h8'/%3E%3Cpath d='M55 4l5 5-21 21-7 2 2-7z'/%3E%3Cpath d='M29 36h27a4 4 0 0 1 4 4v13a4 4 0 0 1-4 4h-3v6l-7-6H29a4 4 0 0 1-4-4V40a4 4 0 0 1 4-4z'/%3E%3Cpath d='M35 53v-8h3l4-6c2 0 3 1.2 2.6 3.2L44 45h6a2 2 0 0 1 2 2.4l-1.2 4.4a2 2 0 0 1-2 1.2z'/%3E%3C/svg%3E"); }
