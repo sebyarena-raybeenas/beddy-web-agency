@@ -13,7 +13,7 @@ class ClientsTable
     {
         return $table
             ->columns([
-                TextColumn::make('name')->label('Nome')->searchable()->sortable(),
+                TextColumn::make('name')->label('Cliente')->searchable()->sortable(),
                 TextColumn::make('legal_name')->label('Ragione sociale')->searchable()->placeholder('—'),
                 TextColumn::make('vat_number')->label('Partita IVA')->searchable(),
                 TextColumn::make('hosting_status')->label('Hosting')->badge(),
