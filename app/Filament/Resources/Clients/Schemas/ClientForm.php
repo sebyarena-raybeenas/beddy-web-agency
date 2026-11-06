@@ -20,7 +20,8 @@ class ClientForm
     {
         return $schema
             ->components([
-                TextInput::make('name')->label('Ragione sociale')->required()->maxLength(255),
+                TextInput::make('name')->label('Nome (struttura)')->required()->maxLength(255),
+                TextInput::make('legal_name')->label('Ragione sociale')->maxLength(255),
                 TextInput::make('vat_number')->label('Partita IVA')->maxLength(255),
                 TextInput::make('address')->label('Indirizzo')->maxLength(255),
                 Select::make('hosting_status')->label('Hosting')->options(HostingStatus::class),

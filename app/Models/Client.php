@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'vat_number', 'address', 'has_assistance', 'assistance_type', 'hosting_status', 'origin', 'created_by'])]
+#[Fillable(['name', 'legal_name', 'vat_number', 'address', 'has_assistance', 'assistance_type', 'hosting_status', 'origin', 'created_by'])]
 class Client extends Model
 {
     /** @use HasFactory<ClientFactory> */

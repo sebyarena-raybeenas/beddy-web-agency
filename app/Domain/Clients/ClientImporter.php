@@ -29,6 +29,7 @@ class ClientImporter
         Validator::make(['rows' => $rows], [
             'rows' => ['required', 'array'],
             'rows.*.name' => ['required', 'string', 'max:255'],
+            'rows.*.legal_name' => ['nullable', 'string', 'max:255'],
             'rows.*.vat_number' => ['nullable', 'string', 'max:255'],
             'rows.*.address' => ['nullable', 'string', 'max:255'],
             'rows.*.has_assistance' => ['nullable', 'boolean'],
@@ -42,7 +43,17 @@ class ClientImporter
             'rows.*.contacts.*.emails' => ['nullable', 'array'],
             'rows.*.contacts.*.emails.*' => ['email', 'max:255'],
             'rows.*.domains' => ['nullable', 'array'],
-            'rows.*.domains.*' => ['string', 'max:255'],
+            // A domain is a plain name (the first one becomes principale) or {name, role}.
+            'rows.*.domains.*' => [function (string $attribute, mixed $value, \Closure $fail): void {
+                $name = is_array($value) ? ($value['name'] ?? null) : $value;
+                $role = is_array($value) ? ($value['role'] ?? null) : null;
+
+                if (! is_string($name) || $name === '' || mb_strlen($name) > 255) {
+                    $fail('Dominio non valido.');
+                } elseif ($role !== null && DomainRole::tryFrom($role) === null) {
+                    $fail('Ruolo del dominio non valido.');
+                }
+            }],
         ])->validate();
 
         $result = ['created' => [], 'skipped' => []];
@@ -57,6 +68,7 @@ class ClientImporter
 
                 $client = Client::create([
                     'name' => $row['name'],
+                    'legal_name' => $row['legal_name'] ?? null,
                     'vat_number' => $row['vat_number'] ?? null,
                     'address' => $row['address'] ?? null,
                     'has_assistance' => (bool) ($row['has_assistance'] ?? false),
@@ -75,16 +87,18 @@ class ClientImporter
                     ]);
                 }
 
-                foreach (array_values($row['domains'] ?? []) as $i => $name) {
+                foreach (array_values($row['domains'] ?? []) as $i => $domain) {
+                    $name = is_array($domain) ? $domain['name'] : $domain;
+                    $role = is_array($domain) && isset($domain['role'])
+                        ? DomainRole::from($domain['role'])
+                        : ($i === 0 ? DomainRole::Principale : DomainRole::Secondario);
+
                     // A domain already registered elsewhere is left alone rather than failing the import.
                     if (Domain::where('name', Domain::normalizeName($name))->exists()) {
                         continue;
                     }
 
-                    $client->domains()->create([
-                        'name' => $name,
-                        'role' => $i === 0 ? DomainRole::Principale : DomainRole::Secondario,
-                    ]);
+                    $client->domains()->create(['name' => $name, 'role' => $role]);
                 }
 
                 $result['created'][] = $row['name'];

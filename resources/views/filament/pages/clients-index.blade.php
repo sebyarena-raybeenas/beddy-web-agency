@@ -28,6 +28,7 @@
                             <span @class(['pb-tag', 'cl-asana' => $client->origin?->value === 'asana', 'cl-man' => $client->origin?->value !== 'asana'])>{{ $client->origin?->label() }}</span>
                         </div>
                     </a>
+                    <div class="cl-kv"><span>Ragione sociale</span><b>{{ $client->legal_name ?: '—' }}</b></div>
                     <div class="cl-kv"><span>Referente</span><b>{{ $contact?->name ?? '—' }}</b></div>
                     <div class="cl-kv"><span>Progetti attivi</span><b>
                         <a href="{{ url('/') }}?search={{ urlencode($client->name) }}" class="cl-link">{{ $client->active_projects_count }}</a>

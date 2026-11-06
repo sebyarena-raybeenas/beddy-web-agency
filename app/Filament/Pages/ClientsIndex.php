@@ -48,7 +48,7 @@ class ClientsIndex extends Page
                 $like = '%'.$term.'%';
                 $normalized = Domain::normalizeName($term);
                 $q->where(function (Builder $w) use ($like, $normalized) {
-                    $w->where('name', 'like', $like);
+                    $w->where('name', 'like', $like)->orWhere('legal_name', 'like', $like);
                     if ($normalized !== '') {
                         $domain = '%'.$normalized.'%';
                         $w->orWhereHas('domains', fn (Builder $d) => $d->where('name', 'like', $domain))
