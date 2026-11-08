@@ -256,3 +256,18 @@ it('accepts office and odf documents on a material upload', function (string $na
 it('allows material uploads up to the 20 MB limit at the Livewire layer too', function () {
     expect(config('livewire.temporary_file_upload.rules'))->toContain('max:20480');
 });
+
+it('saves payment, hosting and assistance from the project form', function () {
+    $project = Project::factory()->create();
+
+    Livewire::test(EditProject::class, ['record' => $project->getRouteKey()])
+        ->fillForm(['payment_status' => 'acconto', 'hosting_status' => 'suo', 'has_assistance' => true, 'assistance_type' => 'Base'])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $project->refresh();
+    expect($project->payment_status->value)->toBe('acconto')
+        ->and($project->hosting_status->value)->toBe('suo')
+        ->and($project->has_assistance)->toBeTrue()
+        ->and($project->assistance_type)->toBe('Base');
+});

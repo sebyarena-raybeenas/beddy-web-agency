@@ -5,8 +5,10 @@ namespace App\Models;
 use App\Domain\Workflow\InvalidTransition;
 use App\Domain\Workflow\Workflow;
 use App\Domain\Workflow\WorkflowRegistry;
+use App\Enums\HostingStatus;
 use App\Enums\MaterialStatus;
 use App\Enums\Origin;
+use App\Enums\PaymentStatus;
 use App\Enums\ProjectType;
 use App\Filament\Resources\Projects\ProjectResource;
 use App\Models\Concerns\LogsModelActivity;
@@ -23,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
 use Spatie\Activitylog\Models\Activity;
 
-#[Fillable(['client_id', 'name', 'type', 'status', 'owner_id', 'due_date', 'primary_domain_id', 'origin', 'created_by'])]
+#[Fillable(['client_id', 'name', 'type', 'status', 'payment_status', 'hosting_status', 'has_assistance', 'assistance_type', 'owner_id', 'due_date', 'primary_domain_id', 'origin', 'created_by'])]
 class Project extends Model
 {
     /** @use HasFactory<ProjectFactory> */
@@ -33,6 +35,8 @@ class Project extends Model
 
     protected $attributes = [
         'origin' => 'manuale',
+        'payment_status' => 'non_pagato',
+        'has_assistance' => false,
     ];
 
     protected function casts(): array
@@ -40,6 +44,9 @@ class Project extends Model
         return [
             'type' => ProjectType::class,
             'origin' => Origin::class,
+            'payment_status' => PaymentStatus::class,
+            'hosting_status' => HostingStatus::class,
+            'has_assistance' => 'boolean',
             'status_changed_at' => 'datetime',
             'due_date' => 'date',
         ];
@@ -162,6 +169,34 @@ class Project extends Model
 
     /** Days after which an awaited material counts as late. */
     public const LATE_MATERIAL_DAYS = 7;
+
+    /** States in which development is under way (or about to start): the deposit should be paid. */
+    public const DEVELOPMENT_STATES = ['pronto_da_sviluppare', 'in_sviluppo', 'pronto_da_modificare', 'in_modifica'];
+
+    /** States right before going online: the balance should be paid. */
+    public const PUBLISHING_STATES = ['in_pubblicazione', 'in_attesa_feedback', 'feedback_altre_modifiche'];
+
+    /**
+     * A reminder when the work is ahead of the payments; it never blocks a status change.
+     */
+    public function paymentWarning(): ?string
+    {
+        $isModifica = $this->type === ProjectType::Modifica;
+
+        if (in_array($this->status, self::DEVELOPMENT_STATES, true) && ! $this->payment_status->allowsDevelopment()) {
+            return 'Acconto non ancora pagato: verifica prima di '.($isModifica ? 'fare le modifiche.' : 'sviluppare il sito.');
+        }
+
+        $publishing = $isModifica
+            ? in_array($this->status, ['in_attesa_feedback', 'feedback_altre_modifiche'], true)
+            : $this->status === 'in_pubblicazione';
+
+        if ($publishing && ! $this->payment_status->allowsPublishing()) {
+            return 'Saldo non ancora pagato: verifica prima di pubblicare '.($isModifica ? 'le modifiche.' : 'il sito.');
+        }
+
+        return null;
+    }
 
     /** States in which the client asked for changes after seeing the work. */
     public const FEEDBACK_STATES = ['feedback_modifiche', 'feedback_altre_modifiche'];

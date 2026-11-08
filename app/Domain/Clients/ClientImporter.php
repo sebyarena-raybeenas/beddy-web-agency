@@ -3,13 +3,11 @@
 namespace App\Domain\Clients;
 
 use App\Enums\DomainRole;
-use App\Enums\HostingStatus;
 use App\Enums\Origin;
 use App\Models\Client;
 use App\Models\Domain;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -32,9 +30,6 @@ class ClientImporter
             'rows.*.legal_name' => ['nullable', 'string', 'max:255'],
             'rows.*.vat_number' => ['nullable', 'string', 'max:255'],
             'rows.*.address' => ['nullable', 'string', 'max:255'],
-            'rows.*.has_assistance' => ['nullable', 'boolean'],
-            'rows.*.assistance_type' => ['nullable', 'string', 'max:255'],
-            'rows.*.hosting_status' => ['nullable', Rule::enum(HostingStatus::class)],
             'rows.*.contacts' => ['nullable', 'array'],
             'rows.*.contacts.*.name' => ['required', 'string', 'max:255'],
             'rows.*.contacts.*.role' => ['nullable', 'string', 'max:255'],
@@ -71,9 +66,6 @@ class ClientImporter
                     'legal_name' => $row['legal_name'] ?? null,
                     'vat_number' => $row['vat_number'] ?? null,
                     'address' => $row['address'] ?? null,
-                    'has_assistance' => (bool) ($row['has_assistance'] ?? false),
-                    'assistance_type' => $row['assistance_type'] ?? null,
-                    'hosting_status' => $row['hosting_status'] ?? null,
                     'origin' => $origin,
                 ]);
 

@@ -27,7 +27,6 @@ it('creates a client with a contact and a domain', function () {
     Livewire::test(CreateClient::class)
         ->fillForm([
             'name' => 'Rossi Srl',
-            'hosting_status' => 'nostro',
             'contacts' => [[
                 'name' => 'Mario Rossi',
                 'phones' => [['value' => '333 1'], ['value' => '06 2'], ['value' => '']],

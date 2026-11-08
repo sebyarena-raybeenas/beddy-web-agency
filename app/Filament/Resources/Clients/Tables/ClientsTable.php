@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Clients\Tables;
 
 use Filament\Actions\EditAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -16,8 +15,6 @@ class ClientsTable
                 TextColumn::make('name')->label('Cliente')->searchable()->sortable(),
                 TextColumn::make('legal_name')->label('Ragione sociale')->searchable()->placeholder('—'),
                 TextColumn::make('vat_number')->label('Partita IVA')->searchable(),
-                TextColumn::make('hosting_status')->label('Hosting')->badge(),
-                IconColumn::make('has_assistance')->label('Assistenza')->boolean(),
                 TextColumn::make('projects_count')->label('Progetti')->counts('projects'),
             ])
             ->defaultSort('name')

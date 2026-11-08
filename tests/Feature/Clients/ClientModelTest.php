@@ -56,7 +56,6 @@ it('exposes contacts and domains relations and defaults', function () {
     expect($client->contacts)->toHaveCount(1)
         ->and($client->domains)->toHaveCount(1)
         ->and($client->origin)->toBe(Origin::Manuale)
-        ->and($client->has_assistance)->toBeFalse()
         ->and($client->domains->first()->role)->toBe(DomainRole::Secondario)
         ->and(HostingStatus::DaAttivare->label())->toBe('Da attivare')
         ->and(DomainOwnership::DaAcquistare->label())->toBe('Da acquistare');

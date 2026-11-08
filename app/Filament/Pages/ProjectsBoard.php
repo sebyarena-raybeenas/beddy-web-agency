@@ -52,6 +52,10 @@ class ProjectsBoard extends Page
     #[Url]
     public bool $lateMaterial = false;
 
+    /** scadenza | alfabetico | stato */
+    #[Url]
+    public string $sort = 'scadenza';
+
     /** Flow shown by the kanban view. */
     #[Url]
     public string $flow = 'sito';
@@ -233,10 +237,34 @@ class ProjectsBoard extends Page
         return $query
             ->with(['client', 'owner', 'requirements', 'materials', 'primaryDomain'])
             ->withCount(['tasks', 'tasks as tasks_done_count' => fn (Builder $t) => $t->whereNotNull('completed_at')])
-            ->orderByRaw('due_date is null')
-            ->orderBy('due_date')
-            ->orderBy('name')
+            ->tap(fn (Builder $q) => $this->applySort($q))
             ->get();
+    }
+
+    private function applySort(Builder $query): void
+    {
+        match ($this->sort) {
+            'alfabetico' => $query->orderBy('name')->orderBy('id'),
+            'stato' => $query->orderByRaw(self::statusOrderSql())->orderBy('name'),
+            default => $query->orderByRaw('due_date is null')->orderBy('due_date')->orderBy('name'),
+        };
+    }
+
+    /** Workflow order: the sito states first, then the modifica ones, as in the counters. */
+    private static function statusOrderSql(): string
+    {
+        $order = [];
+        foreach (self::groups() as $group) {
+            foreach ($group['pairs'] as [, $key]) {
+                $order[$key] ??= count($order);
+            }
+        }
+
+        $cases = collect($order)
+            ->map(fn (int $i, string $key) => "when status = '".str_replace("'", "''", $key)."' then {$i}")
+            ->implode(' ');
+
+        return "case {$cases} else ".count($order).' end';
     }
 
     /** All filters except the status counter. */

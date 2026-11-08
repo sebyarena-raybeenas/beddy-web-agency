@@ -23,6 +23,7 @@
         @if ($lateMaterial)
             <span class="pb-warn">⚠ materiale in ritardo</span>
         @endif
+        <span class="pb-pay {{ $project->payment_status->pill() }}" title="Pagamento">💶 {{ $project->payment_status->label() }}</span>
     </div>
     <div class="pb-mid" style="margin:4px 0 6px"><span>Avanzamento to-do</span><b style="color:var(--ink)">{{ $pct }}%</b></div>
     <div class="pb-prog"><i style="width:{{ $pct }}%"></i></div>
@@ -39,7 +40,7 @@
         <div class="pb-meta"><span>☑ {{ $tasksDone }}/{{ $tasksTotal }} to-do</span><span>✓ {{ $doneReqs }}/{{ $project->requirements->count() }} requisiti</span></div>
     </div>
     <div class="pb-ft">
-        <div><span>Dominio / hosting</span><b>{{ $project->primaryDomain?->name ?? '—' }} · {{ $project->client->hosting_status?->label() ?? '—' }}</b></div>
+        <div><span>Dominio / hosting</span><b>{{ $project->primaryDomain?->name ?? '—' }} · {{ $project->hosting_status?->label() ?? '—' }}</b></div>
         <div><span>Origine</span><b><span class="pb-tag">{{ $project->origin->label() }}</span></b></div>
         <div><span>Responsabile</span><b>{{ $project->owner?->name ?? 'Nessun responsabile' }}</b></div>
     </div>

@@ -41,8 +41,6 @@
                         @endforelse
                     </b></div>
                     <div class="cl-kv"><span>Domini principali</span><b>{{ $domains->isEmpty() ? '—' : $domains->implode(', ') }}</b></div>
-                    <div class="cl-kv"><span>Assistenza</span><b>{{ $client->has_assistance ? 'Sì' : 'No' }}</b></div>
-                    <div class="cl-kv"><span>Hosting</span><b>{{ $client->hosting_status?->label() ?? '—' }}</b></div>
                 </div>
             @empty
                 <div class="pb-empty">Nessun cliente trovato.</div>

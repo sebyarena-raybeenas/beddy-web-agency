@@ -95,3 +95,11 @@
 .pd-chk.pd-done .pd-t { text-decoration: line-through; text-decoration-thickness: 2px; color: var(--mute); }
 .pd-chk.pd-done .pd-r { opacity: 0.6; }
 .pd-box > h3 + .pd-group { margin-top: 0; }
+
+/* Payment status: segmented buttons in the detail page, warning when work is ahead of payments. */
+.pd-pay { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
+.pd-pay button { flex: 1; border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 6px 8px; font-size: 12px; font-weight: 700; color: var(--mute); cursor: pointer; white-space: nowrap; }
+.pd-pay button.on.pay-no { background: var(--redSoft); color: var(--red); border-color: var(--red); }
+.pd-pay button.on.pay-acc { background: var(--ambSoft); color: var(--amb); border-color: var(--amb); }
+.pd-pay button.on.pay-ok { background: var(--grnSoft); color: var(--grn); border-color: var(--grn); }
+.pd-alert.pd-alert-pay { background: var(--ambSoft); color: #9a5a00; }

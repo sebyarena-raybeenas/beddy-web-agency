@@ -8,6 +8,7 @@ use App\Domain\Workflow\ProjectStatusService;
 use App\Enums\DomainOwnership;
 use App\Enums\HostingStatus;
 use App\Enums\MaterialStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Client;
 use App\Models\ClientContact;
 use App\Models\Domain;
@@ -32,6 +33,7 @@ class DemoSeeder extends Seeder
         $collega = $this->user('Collega Demo', 'collega@example.test');
 
         $clients = [];
+        $services = [];
         foreach ([
             ['Hotel Rossi', '01234567890', 'Via dei Fiori 1, Roma', true, 'Assistenza annuale', HostingStatus::Nostro],
             ['Ristorante Da Mario', '02345678901', 'Piazza Centrale 5, Milano', false, null, HostingStatus::Suo],
@@ -44,12 +46,11 @@ class DemoSeeder extends Seeder
                 'name' => $name,
                 'vat_number' => $vat,
                 'address' => $address,
-                'has_assistance' => $assist,
-                'assistance_type' => $assistType,
-                'hosting_status' => $hosting,
                 'origin' => 'manuale',
                 'created_by' => $demo->id,
             ]);
+
+            $services[$name] = ['has_assistance' => $assist, 'assistance_type' => $assistType, 'hosting_status' => $hosting];
 
             ClientContact::create([
                 'client_id' => $clients[$name]->id,
@@ -103,6 +104,15 @@ class DemoSeeder extends Seeder
         $modMario = $this->project($clients['Ristorante Da Mario'], 'Modifica menu Ristorante Da Mario', 'modifica', $collega, $demo);
         $this->completeAll($modMario);
         $this->advance($modMario, 'in_modifica', $collega);
+
+        // Hosting and assistance are per project; payments cover the three states.
+        foreach ($services as $name => $values) {
+            $clients[$name]->projects()->update($values);
+        }
+        $mario->update(['payment_status' => PaymentStatus::Acconto]);
+        $bianchi->update(['payment_status' => PaymentStatus::Acconto]);
+        $verdi->update(['payment_status' => PaymentStatus::Saldato]);
+        $blu->update(['payment_status' => PaymentStatus::Acconto]);
     }
 
     private function user(string $name, string $email): User

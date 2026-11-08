@@ -173,3 +173,21 @@ it('has a late-material helper that agrees with the scope at the boundary', func
     expect($notLate->load('materials')->hasLateMaterial($today))->toBeFalse();
     expect(Project::materialOverdue($today)->pluck('id')->all())->toBe([$late->id]);
 });
+
+it('sorts projects by name, due date or status', function () {
+    boardProject('Cliente A', 'Zeta', ['due_date' => today()->addDays(1), 'status' => 'in_preparazione']);
+    boardProject('Cliente B', 'Alfa', ['due_date' => today()->addDays(9), 'status' => 'in_sviluppo']);
+    boardProject('Cliente C', 'Emme', ['due_date' => null, 'status' => 'pubblicato']);
+
+    $names = fn ($page) => collect($page->viewData('projects'))->pluck('name')->all();
+
+    expect($names(Livewire::test(ProjectsBoard::class)))->toBe(['Zeta', 'Alfa', 'Emme'])
+        ->and($names(Livewire::test(ProjectsBoard::class)->set('sort', 'alfabetico')))->toBe(['Alfa', 'Emme', 'Zeta'])
+        ->and($names(Livewire::test(ProjectsBoard::class)->set('sort', 'stato')))->toBe(['Zeta', 'Alfa', 'Emme']);
+});
+
+it('shows the payment status on the card', function () {
+    boardProject('Hotel Rossi', 'Sito Rossi', ['payment_status' => 'acconto']);
+
+    Livewire::test(ProjectsBoard::class)->assertSee('Acconto pagato')->assertSeeHtml('pay-acc');
+});

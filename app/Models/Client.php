@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\HostingStatus;
 use App\Enums\Origin;
 use App\Models\Concerns\LogsModelActivity;
 use Database\Factories\ClientFactory;
@@ -12,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'legal_name', 'vat_number', 'address', 'has_assistance', 'assistance_type', 'hosting_status', 'origin', 'created_by'])]
+#[Fillable(['name', 'legal_name', 'vat_number', 'address', 'origin', 'created_by'])]
 class Client extends Model
 {
     /** @use HasFactory<ClientFactory> */
@@ -22,14 +21,11 @@ class Client extends Model
 
     protected $attributes = [
         'origin' => 'manuale',
-        'has_assistance' => false,
     ];
 
     protected function casts(): array
     {
         return [
-            'has_assistance' => 'boolean',
-            'hosting_status' => HostingStatus::class,
             'origin' => Origin::class,
         ];
     }

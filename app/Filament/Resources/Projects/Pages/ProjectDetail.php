@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Projects\Pages;
 use App\Domain\Workflow\InvalidTransition;
 use App\Domain\Workflow\ProjectStatusService;
 use App\Enums\MaterialStatus;
+use App\Enums\PaymentStatus;
 use App\Filament\Resources\Clients\ClientResource;
 use App\Filament\Resources\Projects\Actions\ChangeStatusAction;
 use App\Filament\Resources\Projects\ProjectResource;
@@ -89,6 +90,19 @@ class ProjectDetail extends Page
         ]);
 
         $this->notifyIfStatusChanged($before);
+    }
+
+    public function setPaymentStatus(string $status): void
+    {
+        $new = PaymentStatus::tryFrom($status);
+
+        if ($new === null) {
+            Notification::make()->title('Stato di pagamento non valido')->danger()->send();
+
+            return;
+        }
+
+        $this->project()->update(['payment_status' => $new]);
     }
 
     public function setMaterialStatus(int $id, string $status): void
@@ -204,6 +218,8 @@ class ProjectDetail extends Page
             'overdue' => $project->isOverdue(),
             'timeline' => $project->timeline()->take(12)->map(fn ($entry) => $this->describe($entry, $project)),
             'materialStatuses' => MaterialStatus::cases(),
+            'paymentStatuses' => PaymentStatus::cases(),
+            'paymentWarning' => $project->paymentWarning(),
             'clientUrl' => ClientResource::getUrl('edit', ['record' => $project->client]),
             'editUrl' => ProjectResource::getUrl('edit', ['record' => $project]),
         ];

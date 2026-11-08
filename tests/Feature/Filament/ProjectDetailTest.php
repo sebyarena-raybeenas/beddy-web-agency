@@ -2,6 +2,7 @@
 
 use App\Enums\MaterialKind;
 use App\Enums\MaterialStatus;
+use App\Enums\PaymentStatus;
 use App\Enums\ProjectType;
 use App\Filament\Resources\Projects\Pages\ProjectDetail;
 use App\Models\Attachment;
@@ -280,4 +281,34 @@ it('words the timeline for a completed task and a received material in Italian',
         ->assertSeeHtml('<b>Sara Admin</b> ha completato il to-do <b>«Home page»</b>')
         ->call('setMaterialStatus', $material->id, 'ricevuto')
         ->assertSeeHtml('<b>Sara Admin</b> ha segnato «Ricevuto» il materiale <b>Foto</b>');
+});
+
+it('changes the payment status from the detail page', function () {
+    $project = Project::factory()->create();
+
+    expect($project->payment_status)->toBe(PaymentStatus::NonPagato);
+
+    detail($project)->call('setPaymentStatus', 'saldato')->assertSeeHtml('pay-ok');
+    expect($project->fresh()->payment_status)->toBe(PaymentStatus::Saldato);
+
+    detail($project)->call('setPaymentStatus', 'boh');
+    expect($project->fresh()->payment_status)->toBe(PaymentStatus::Saldato);
+});
+
+it('warns when the work is ahead of the payments', function () {
+    $dev = Project::factory()->create(['status' => 'in_sviluppo', 'payment_status' => 'non_pagato']);
+    $pub = Project::factory()->create(['status' => 'in_pubblicazione', 'payment_status' => 'acconto']);
+    $ok = Project::factory()->create(['status' => 'in_pubblicazione', 'payment_status' => 'saldato']);
+    $mod = Project::factory()->create(['type' => ProjectType::Modifica, 'status' => 'in_attesa_feedback', 'payment_status' => 'acconto']);
+
+    detail($dev)->assertSee('Acconto non ancora pagato');
+    detail($pub)->assertSee('Saldo non ancora pagato');
+    expect($ok->paymentWarning())->toBeNull()
+        ->and($mod->paymentWarning())->toContain('pubblicare le modifiche');
+});
+
+it('shows hosting and assistance of the project, not of the client', function () {
+    $project = Project::factory()->create(['hosting_status' => 'nostro', 'has_assistance' => true, 'assistance_type' => 'Annuale']);
+
+    detail($project)->assertSee('Pagamento e servizi')->assertSee('Sì, Annuale')->assertSee('Nostro');
 });

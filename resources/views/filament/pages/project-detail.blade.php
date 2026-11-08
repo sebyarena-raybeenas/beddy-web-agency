@@ -13,6 +13,9 @@
         @if ($alert)
             <div class="pd-alert">ℹ {{ $alert }} Scadenza: <b>{{ $project->due_date->format('d/m/Y') }}</b></div>
         @endif
+        @if ($paymentWarning)
+            <div class="pd-alert pd-alert-pay">💶 {{ $paymentWarning }}</div>
+        @endif
 
         <div class="pd-card pd-hero">
             <div class="pd-cover"><div class="pd-shot"><div class="b1"></div><div class="b2"></div><div class="b3"><i></i><i></i><i></i></div></div></div>
@@ -153,13 +156,22 @@
 
             <div>
                 <div class="pd-card pd-box">
+                    <h3>Pagamento e servizi</h3>
+                    <div class="pd-pay">
+                        @foreach ($paymentStatuses as $ps)
+                            <button type="button" wire:click="setPaymentStatus('{{ $ps->value }}')" @class(['on' => $project->payment_status === $ps, $ps->pill()])>{{ $ps->label() }}</button>
+                        @endforeach
+                    </div>
+                    <div class="pd-kv"><span>Assistenza</span><b @style(['color:var(--grn)' => $project->has_assistance])>{{ $project->has_assistance ? 'Sì'.($project->assistance_type ? ', '.$project->assistance_type : '') : 'No' }}</b></div>
+                    <div class="pd-kv"><span>Hosting</span><b>{{ $project->hosting_status?->label() ?? '—' }}</b></div>
+                    <div class="pd-kv"><span>Dominio</span><b>{{ $project->primaryDomain ? $project->primaryDomain->name.($project->primaryDomain->ownership ? ' · '.$project->primaryDomain->ownership->label() : '') : '—' }}</b></div>
+                </div>
+
+                <div class="pd-card pd-box">
                     <h3>Cliente</h3>
                     <div class="pd-kv"><span>Referente</span><b>{{ $contact?->name ?? '—' }}</b></div>
                     <div class="pd-kv"><span>Telefoni</span><b>@forelse (array_filter($contact?->phones ?? []) as $phone){{ $phone }}@unless ($loop->last)<br>@endunless @empty — @endforelse</b></div>
                     <div class="pd-kv"><span>Email</span><b>@forelse (array_filter($contact?->emails ?? []) as $email){{ $email }}@unless ($loop->last)<br>@endunless @empty — @endforelse</b></div>
-                    <div class="pd-kv"><span>Assistenza</span><b @style(['color:var(--grn)' => $project->client->has_assistance])>{{ $project->client->has_assistance ? 'Sì'.($project->client->assistance_type ? ', '.$project->client->assistance_type : '') : 'No' }}</b></div>
-                    <div class="pd-kv"><span>Dominio</span><b>{{ $project->primaryDomain ? $project->primaryDomain->name.($project->primaryDomain->ownership ? ' · '.$project->primaryDomain->ownership->label() : '') : '—' }}</b></div>
-                    <div class="pd-kv"><span>Hosting</span><b>{{ $project->client->hosting_status?->label() ?? '—' }}</b></div>
                 </div>
 
                 <div class="pd-card pd-box">

@@ -16,7 +16,7 @@ beforeEach(function () {
 });
 
 it('renders the clients page at /clienti', function () {
-    $client = Client::factory()->create(['name' => 'Hotel Rossi', 'has_assistance' => true]);
+    $client = Client::factory()->create(['name' => 'Hotel Rossi']);
     ClientContact::create(['client_id' => $client->id, 'name' => 'Mario Rossi', 'is_primary' => true]);
 
     $this->get('/clienti')->assertOk()->assertSee('Hotel Rossi')->assertSee('Aggiungi cliente');

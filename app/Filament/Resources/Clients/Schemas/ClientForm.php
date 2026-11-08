@@ -4,14 +4,11 @@ namespace App\Filament\Resources\Clients\Schemas;
 
 use App\Enums\DomainOwnership;
 use App\Enums\DomainRole;
-use App\Enums\HostingStatus;
 use App\Filament\Support\UniqueDomainName;
 use Closure;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class ClientForm
@@ -24,12 +21,6 @@ class ClientForm
                 TextInput::make('legal_name')->label('Ragione sociale')->maxLength(255),
                 TextInput::make('vat_number')->label('Partita IVA')->maxLength(255),
                 TextInput::make('address')->label('Indirizzo')->maxLength(255),
-                Select::make('hosting_status')->label('Hosting')->options(HostingStatus::class),
-                Toggle::make('has_assistance')->label('Assistenza')->live(),
-                TextInput::make('assistance_type')
-                    ->label('Tipo di assistenza')
-                    ->maxLength(255)
-                    ->visible(fn (Get $get): bool => (bool) $get('has_assistance')),
 
                 // On creation contacts and domains are entered inline; afterwards the relation managers take over.
                 Repeater::make('contacts')

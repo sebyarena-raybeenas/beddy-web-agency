@@ -33,6 +33,11 @@
                     <option value="{{ $id }}">{{ $name }}</option>
                 @endforeach
             </select>
+            <select wire:model.live="sort" class="pb-input" title="Ordina">
+                <option value="scadenza">Ordina: scadenza</option>
+                <option value="alfabetico">Ordina: nome (A-Z)</option>
+                <option value="stato">Ordina: stato</option>
+            </select>
             <button type="button" wire:click="toggleMine" @class(['pb-chip', 'on' => $owner === auth()->id()])>👤 Assegnati a me</button>
             <button type="button" wire:click="$toggle('dueSoon')" @class(['pb-chip', 'on' => $dueSoon])>⏰ In scadenza</button>
             <button type="button" wire:click="$toggle('lateMaterial')" @class(['pb-chip', 'on' => $lateMaterial])>⚠ Materiale in ritardo</button>
@@ -68,6 +73,9 @@
                                     @endif
                                     <span class="pb-meta">📅 {{ $p->due_date?->format('d/m/Y') ?? '—' }}</span>
                                 </div>
+                                <div class="pb-row" style="margin-top:6px">
+                                    <span class="pb-pay {{ $p->payment_status->pill() }}">💶 {{ $p->payment_status->label() }}</span>
+                                </div>
                             </a>
                         @endforeach
                     </div>
@@ -76,7 +84,7 @@
         @elseif ($viewMode === 'list')
             <div class="pb-card" style="overflow-x:auto">
                 <table class="pb-table">
-                    <tr><th>Progetto / cliente</th><th>Tipo</th><th>Stato</th><th>Requisiti</th><th>To-do</th><th>Responsabile</th><th>Scadenza</th><th>Avvisi</th></tr>
+                    <tr><th>Progetto / cliente</th><th>Tipo</th><th>Stato</th><th>Requisiti</th><th>To-do</th><th>Responsabile</th><th>Scadenza</th><th>Pagamento</th><th>Avvisi</th></tr>
                     @forelse ($projects as $p)
                         @php
                             $overdue = $p->isOverdue();
@@ -97,10 +105,11 @@
                                 @endif
                             </td>
                             <td @class(['pb-warn' => $overdue])>{{ $p->due_date?->format('d/m/Y') ?? '—' }}</td>
+                            <td><span class="pb-pay {{ $p->payment_status->pill() }}">{{ $p->payment_status->label() }}</span></td>
                             <td>@if ($late)<span class="pb-warn">materiale in ritardo</span>@else — @endif</td>
                         </tr>
                     @empty
-                        <tr><td colspan="8" class="pb-empty">Nessun progetto trovato.</td></tr>
+                        <tr><td colspan="9" class="pb-empty">Nessun progetto trovato.</td></tr>
                     @endforelse
                 </table>
             </div>
