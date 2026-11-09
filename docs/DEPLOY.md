@@ -157,3 +157,137 @@ php artisan up
 ## 13. Backup
 
 Salva regolarmente il database (`mysqldump beddy_web_agency`) e la cartella `storage/app/private` (allegati), oltre al file `.env` in un luogo sicuro.
+
+---
+
+# Ambiente di prova su cPanel (es. `dev.raybeenas.it`)
+
+Procedura usata per pubblicare l'ambiente di prova su un hosting con **cPanel** e accesso SSH. Segnaposto: `<utente>` è il nome utente dell'account cPanel; l'app sta in `/home/<utente>/beddy-dev`.
+
+Legenda: 🖥️ PC di sviluppo (codice e Laragon) · 🌐 cPanel dal browser · 🔐 SSH sul server.
+
+> **Lavora sempre con l'utente dell'account cPanel, mai come `root`.** Se ti colleghi come root, passa all'utente con `su - <utente>` prima di qualsiasi comando: altrimenti i file finiscono in `/root` e appartengono a root, e il sito non può scrivere in `storage`.
+>
+> Se cPanel ha la funzione **Terminal** (sezione *Avanzate*), è un terminale SSH nel browser: si può fare tutto da un solo PC.
+
+## 1. Preparazione in cPanel 🌐
+
+1. **Sottodominio** (*Domini*): crea `dev.<dominio>` con **document root** `beddy-dev/public`. Se i DNS non sono gestiti da questo cPanel, aggiungi dove sono un record **A** `dev` con l'IP del server.
+2. **HTTPS** (*Stato SSL/TLS*): seleziona il sottodominio → **Esegui AutoSSL**.
+3. **PHP** (*MultiPHP Manager*): PHP **8.4** per il sottodominio. Controlla le estensioni (*Seleziona versione PHP* o *MultiPHP INI Editor*): `bcmath`, `intl`, `mbstring`, `pdo_mysql`, `zip`, `fileinfo`, `gd`, `xml`, `curl`.
+4. **Database** (*Procedura guidata database MySQL*): database + utente con **tutti i privilegi**. cPanel aggiunge il prefisso dell'account ai nomi (`<utente>_...`). Usa una password di **sole lettere e numeri**: un `#` nel `.env` viene letto come inizio di un commento e tronca la password (errore `1045 Access denied`).
+5. **Casella email** (*Account email*): es. `noreply@<dominio>`; da *Connetti dispositivi* annota server SMTP (di solito `mail.<dominio>`) e porta SSL (465).
+
+## 2. Codice sul server 🔐
+
+```bash
+php -v                       # deve essere 8.4; altrimenti usa /opt/cpanel/ea-php84/root/usr/bin/php
+```
+
+Chiave di sola lettura per il repository privato:
+
+```bash
+ssh-keygen -t ed25519 -C "deploy dev" -f ~/.ssh/beddy_deploy -N ""
+cat ~/.ssh/beddy_deploy.pub  # da aggiungere su GitHub: Settings → Deploy keys (senza scrittura)
+git config --global core.sshCommand "ssh -i ~/.ssh/beddy_deploy"
+```
+
+```bash
+cd ~ && git clone git@github.com:sebyarena-raybeenas/beddy-web-agency.git beddy-dev
+cd ~/beddy-dev && git checkout <ramo-o-tag>
+php $(which composer) install --no-dev --optimize-autoloader
+# senza composer: curl -sS https://getcomposer.org/installer | php && php composer.phar install --no-dev --optimize-autoloader
+```
+
+## 3. Asset grafici 🖥️ + 🌐
+
+Di solito sui server cPanel non c'è Node.js: la build si fa sul PC di sviluppo.
+
+1. 🖥️ `npm run build`, poi comprimi `public/build` in uno zip.
+2. 🌐 *Gestione file* → `beddy-dev/public` → carica lo zip → **Estrai** → elimina lo zip.
+3. Verifica che esista `public/build/manifest.json` (non `public/build/build/...`).
+
+## 4. Dati (facoltativo) 🖥️ + 🌐
+
+Per portare i dati del PC di sviluppo:
+
+1. 🖥️ `mysqldump -uroot beddy_web_agency > beddy-export.sql`
+2. 🌐 *phpMyAdmin* → database dell'app → **Importa** il file.
+3. Allegati: copia `storage/app/private` nella stessa cartella sul server.
+4. **Elimina `beddy-export.sql`** dal PC e dal server: contiene dati personali.
+5. Dopo il primo accesso, **elimina gli utenti demo** (`demo@example.test`, `collega@example.test`, password nota) dalla sezione Utenti.
+
+## 5. Configurazione 🔐
+
+```bash
+cd ~/beddy-dev && cp .env.example .env && php artisan key:generate
+```
+
+Modifica il `.env` **senza cancellare la riga `APP_KEY`** generata (senza chiave l'app risponde 500 con `MissingAppKeyException`; si rimedia con `php artisan key:generate`):
+
+```dotenv
+APP_ENV=staging
+APP_DEBUG=false
+APP_URL=https://dev.<dominio>
+APP_TIMEZONE=Europe/Rome
+APP_LOCALE=it
+
+DB_HOST=localhost
+DB_DATABASE=<utente>_<database>
+DB_USERNAME=<utente>_<utente-db>
+DB_PASSWORD=<password-solo-lettere-e-numeri>
+
+SESSION_DRIVER=database
+CACHE_STORE=database
+QUEUE_CONNECTION=database
+
+MAIL_MAILER=smtp
+MAIL_SCHEME=smtps
+MAIL_HOST=mail.<dominio>
+MAIL_PORT=465
+MAIL_USERNAME=noreply@<dominio>
+MAIL_PASSWORD=<password-casella>
+MAIL_FROM_ADDRESS=noreply@<dominio>
+```
+
+`APP_ENV` non deve mai essere `local`. Se una password contiene simboli, mettila tra apici singoli (`'...'`).
+
+```bash
+php artisan migrate --force
+php artisan db:seed --class=TemplateSeeder --force   # solo su database vuoto (non dopo un'importazione)
+chmod 711 ~ && chmod 755 ~/beddy-dev ~/beddy-dev/public && chmod -R 755 storage bootstrap/cache
+php artisan optimize
+php artisan beddy:invite "Nome Cognome" nome@dominio   # primo utente
+```
+
+Su cPanel PHP gira con l'utente dell'account: bastano permessi 755 (le cartelle scrivibili dal gruppo, 775/777, possono causare 403/500).
+
+## 6. Cron e protezione 🌐
+
+- *Processi Cron* → **Una volta al minuto**, comando:
+
+  ```bash
+  cd /home/<utente>/beddy-dev && /opt/cpanel/ea-php84/root/usr/bin/php artisan schedule:run >> /dev/null 2>&1
+  ```
+
+  Verifica con `php artisan schedule:list` (deve comparire `beddy:reminders` alle 09:00).
+- Consigliato: *Privacy directory* su `beddy-dev/public` per proteggere con password l'intero ambiente di prova.
+
+## 7. Aggiornamenti
+
+1. 🖥️ Se è cambiata la grafica: `npm run build` e ricarica `public/build` (punto 3).
+2. 🔐
+
+   ```bash
+   cd ~/beddy-dev && php artisan down && git pull && php $(which composer) install --no-dev --optimize-autoloader && php artisan migrate --force && php artisan optimize:clear && php artisan optimize && php artisan up
+   ```
+
+## 8. Problemi già incontrati
+
+| Sintomo | Causa | Soluzione |
+|---|---|---|
+| `1045 Access denied` su `migrate` | `#` nella password del `.env` | Password di sole lettere e numeri, o tra apici singoli; poi `php artisan config:clear` |
+| 403 Forbidden | Document root sbagliato o app clonata in `/root` | Document root su `beddy-dev/public`; app in `/home/<utente>`, proprietario l'utente dell'account (`chown -R <utente>:<utente>`) |
+| 500 con `MissingAppKeyException` | `APP_KEY` mancante nel `.env` | `php artisan key:generate && php artisan optimize:clear && php artisan optimize` |
+| Errori dopo aver spostato la cartella | Configurazione memorizzata con il percorso vecchio | `php artisan optimize:clear && php artisan optimize` |
+| Diagnosi | — | cPanel → *Metriche → Errori*; `tail -40 storage/logs/laravel.log` |
