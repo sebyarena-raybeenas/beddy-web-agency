@@ -3,6 +3,7 @@
 use App\Enums\MaterialKind;
 use App\Enums\MaterialStatus;
 use App\Enums\PaymentStatus;
+use App\Enums\ProjectPriority;
 use App\Enums\ProjectType;
 use App\Filament\Resources\Projects\Pages\ProjectDetail;
 use App\Models\Attachment;
@@ -12,6 +13,7 @@ use App\Models\Client;
 use App\Models\Material;
 use App\Models\Project;
 use App\Models\ProjectRequirement;
+use App\Models\SalesRep;
 use App\Models\Task;
 use App\Models\User;
 use Filament\Notifications\Notification;
@@ -311,4 +313,15 @@ it('shows hosting and assistance of the project, not of the client', function ()
     $project = Project::factory()->create(['hosting_status' => 'nostro', 'has_assistance' => true, 'assistance_type' => 'Annuale']);
 
     detail($project)->assertSee('Pagamento e servizi')->assertSee('Sì, Annuale')->assertSee('Nostro');
+});
+
+it('changes the priority from the detail page and shows the sales rep', function () {
+    $rep = SalesRep::factory()->create(['name' => 'Marco Venditore']);
+    $project = Project::factory()->create(['sales_rep_id' => $rep->id]);
+
+    expect($project->priority)->toBe(ProjectPriority::Normale);
+
+    detail($project)->assertSee('Marco Venditore')->call('setPriority', 'alta')->assertSeeHtml('prio-alta');
+
+    expect($project->fresh()->priority)->toBe(ProjectPriority::Alta);
 });

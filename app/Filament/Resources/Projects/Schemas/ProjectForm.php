@@ -4,7 +4,9 @@ namespace App\Filament\Resources\Projects\Schemas;
 
 use App\Enums\HostingStatus;
 use App\Enums\PaymentStatus;
+use App\Enums\ProjectPriority;
 use App\Enums\ProjectType;
+use App\Filament\Resources\SalesReps\SalesRepResource;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -37,6 +39,19 @@ class ProjectForm
                     ->relationship('owner', 'name')
                     ->searchable()
                     ->preload(),
+                Select::make('priority')
+                    ->label('Priorità')
+                    ->options(ProjectPriority::class)
+                    ->default(ProjectPriority::Normale->value)
+                    ->selectablePlaceholder(false)
+                    ->required(),
+                Select::make('sales_rep_id')
+                    ->label('Commerciale di riferimento')
+                    ->relationship('salesRep', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->createOptionForm(SalesRepResource::fields())
+                    ->createOptionModalHeading('Nuovo commerciale'),
                 Select::make('members')
                     ->label('Membri')
                     ->relationship('members', 'name')

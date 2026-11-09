@@ -9,6 +9,7 @@ use App\Enums\HostingStatus;
 use App\Enums\MaterialStatus;
 use App\Enums\Origin;
 use App\Enums\PaymentStatus;
+use App\Enums\ProjectPriority;
 use App\Enums\ProjectType;
 use App\Filament\Resources\Projects\ProjectResource;
 use App\Models\Concerns\LogsModelActivity;
@@ -25,7 +26,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
 use Spatie\Activitylog\Models\Activity;
 
-#[Fillable(['client_id', 'name', 'type', 'status', 'payment_status', 'hosting_status', 'has_assistance', 'assistance_type', 'owner_id', 'due_date', 'primary_domain_id', 'origin', 'created_by'])]
+#[Fillable(['client_id', 'name', 'type', 'status', 'payment_status', 'priority', 'sales_rep_id', 'hosting_status', 'has_assistance', 'assistance_type', 'owner_id', 'due_date', 'primary_domain_id', 'origin', 'created_by'])]
 class Project extends Model
 {
     /** @use HasFactory<ProjectFactory> */
@@ -36,6 +37,7 @@ class Project extends Model
     protected $attributes = [
         'origin' => 'manuale',
         'payment_status' => 'non_pagato',
+        'priority' => 'normale',
         'has_assistance' => false,
     ];
 
@@ -45,6 +47,7 @@ class Project extends Model
             'type' => ProjectType::class,
             'origin' => Origin::class,
             'payment_status' => PaymentStatus::class,
+            'priority' => ProjectPriority::class,
             'hosting_status' => HostingStatus::class,
             'has_assistance' => 'boolean',
             'status_changed_at' => 'datetime',
@@ -110,6 +113,11 @@ class Project extends Model
     public function members(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'project_members');
+    }
+
+    public function salesRep(): BelongsTo
+    {
+        return $this->belongsTo(SalesRep::class);
     }
 
     public function primaryDomain(): BelongsTo

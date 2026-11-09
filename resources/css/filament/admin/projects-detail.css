@@ -23,7 +23,7 @@
 .pd-pri { background: var(--acc); color: #fff; }
 .pd-soft { background: var(--accSoft); color: var(--acc); }
 .pd-ghost { background: var(--card); border: 1px solid var(--line); color: var(--ink); }
-.pd-hmeta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+.pd-hmeta { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
 .pd-hmeta span { display: block; font-size: 12px; color: var(--mute); font-weight: 600; }
 .pd-hmeta b { font-size: 14px; color: var(--ink); }
 
@@ -103,3 +103,10 @@
 .pd-pay button.on.pay-acc { background: var(--ambSoft); color: var(--amb); border-color: var(--amb); }
 .pd-pay button.on.pay-ok { background: var(--grnSoft); color: var(--grn); border-color: var(--grn); }
 .pd-alert.pd-alert-pay { background: var(--ambSoft); color: #9a5a00; }
+
+/* Priority buttons (same look as the payment ones). */
+.pd-prio { margin-bottom: 0; }
+.pd-pay button.on.prio-urgente { background: var(--redSoft); color: var(--red); border-color: var(--red); }
+.pd-pay button.on.prio-alta { background: var(--ambSoft); color: var(--amb); border-color: var(--amb); }
+.pd-pay button.on.prio-normale { background: var(--grySoft); color: #5b6275; border-color: var(--gry); }
+.pd-pay button.on.prio-bassa { background: var(--bluSoft); color: var(--blu); border-color: var(--blu); }

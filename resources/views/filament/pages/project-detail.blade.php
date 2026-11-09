@@ -36,6 +36,7 @@
                 <div class="pd-hmeta">
                     <div><span>Tipo</span><b>{{ $project->type->label() }}</b></div>
                     <div><span>Responsabile</span><b>{{ $project->owner?->name ?? 'Nessun responsabile' }}</b></div>
+                    <div><span>Commerciale</span><b>{{ $project->salesRep?->name ?? '—' }}</b></div>
                     <div>
                         <span>Scadenza</span>
                         <b @style(['color:var(--red)' => $overdue, 'color:var(--amb)' => ! $overdue && $dueDays !== null && $dueDays <= 7])>
@@ -155,6 +156,15 @@
             </div>
 
             <div>
+                <div class="pd-card pd-box">
+                    <h3>Priorità</h3>
+                    <div class="pd-pay pd-prio">
+                        @foreach ($priorities as $pr)
+                            <button type="button" wire:click="setPriority('{{ $pr->value }}')" @class(['on' => $project->priority === $pr, $pr->pill()])>{{ $pr->label() }}</button>
+                        @endforeach
+                    </div>
+                </div>
+
                 <div class="pd-card pd-box">
                     <h3>Pagamento e servizi</h3>
                     <div class="pd-pay">

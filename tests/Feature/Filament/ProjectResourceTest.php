@@ -12,10 +12,13 @@ use App\Filament\Resources\Projects\ProjectResource;
 use App\Filament\Resources\Projects\RelationManagers\DomainsRelationManager;
 use App\Filament\Resources\Projects\RelationManagers\MaterialsRelationManager;
 use App\Filament\Resources\Projects\RelationManagers\TasksRelationManager;
+use App\Filament\Resources\SalesReps\Pages\CreateSalesRep;
+use App\Filament\Resources\SalesReps\SalesRepResource;
 use App\Models\Attachment;
 use App\Models\Client;
 use App\Models\Domain;
 use App\Models\Project;
+use App\Models\SalesRep;
 use App\Models\User;
 use Database\Seeders\TemplateSeeder;
 use Filament\Actions\Testing\TestAction;
@@ -270,4 +273,38 @@ it('saves payment, hosting and assistance from the project form', function () {
         ->and($project->hosting_status->value)->toBe('suo')
         ->and($project->has_assistance)->toBeTrue()
         ->and($project->assistance_type)->toBe('Base');
+});
+
+it('saves priority and sales rep from the project form', function () {
+    $project = Project::factory()->create();
+    $rep = SalesRep::factory()->create();
+
+    Livewire::test(EditProject::class, ['record' => $project->getRouteKey()])
+        ->fillForm(['priority' => 'urgente', 'sales_rep_id' => $rep->id])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($project->fresh()->priority->value)->toBe('urgente')
+        ->and($project->fresh()->salesRep->is($rep))->toBeTrue();
+});
+
+it('manages sales reps and keeps projects when one is deleted', function () {
+    $this->get(SalesRepResource::getUrl('index'))->assertOk();
+
+    Livewire::test(CreateSalesRep::class)
+        ->fillForm(['name' => 'Marco Venditore', 'email' => 'marco@esempio.test'])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    Livewire::test(CreateSalesRep::class)
+        ->fillForm(['name' => 'Marco Venditore'])
+        ->call('create')
+        ->assertHasFormErrors(['name' => 'unique']);
+
+    $rep = SalesRep::where('name', 'Marco Venditore')->firstOrFail();
+    $project = Project::factory()->create(['sales_rep_id' => $rep->id]);
+    $rep->delete();
+
+    expect($project->fresh())->not->toBeNull()
+        ->and($project->fresh()->sales_rep_id)->toBeNull();
 });

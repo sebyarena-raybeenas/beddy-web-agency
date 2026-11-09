@@ -3,9 +3,11 @@
 namespace App\Filament\Pages;
 
 use App\Domain\Workflow\WorkflowRegistry;
+use App\Enums\ProjectPriority;
 use App\Enums\ProjectType;
 use App\Filament\Resources\Projects\ProjectResource;
 use App\Models\Project;
+use App\Models\SalesRep;
 use App\Models\User;
 use BackedEnum;
 use Filament\Pages\Page;
@@ -52,9 +54,22 @@ class ProjectsBoard extends Page
     #[Url]
     public bool $lateMaterial = false;
 
-    /** scadenza | alfabetico | stato */
+    #[Url(as: 'commerciale')]
+    public ?int $salesRep = null;
+
+    /** priorita | scadenza | alfabetico | stato */
     #[Url]
     public string $sort = 'scadenza';
+
+    /** Quick change from the list view. */
+    public function setPriority(int $projectId, string $priority): void
+    {
+        $new = ProjectPriority::tryFrom($priority);
+
+        if ($new !== null) {
+            Project::findOrFail($projectId)->update(['priority' => $new]);
+        }
+    }
 
     /** Flow shown by the kanban view. */
     #[Url]
@@ -206,6 +221,8 @@ class ProjectsBoard extends Page
             'projects' => $projects,
             'columns' => $columns,
             'owners' => User::query()->orderBy('name')->pluck('name', 'id'),
+            'salesReps' => SalesRep::query()->orderBy('name')->pluck('name', 'id'),
+            'priorities' => ProjectPriority::cases(),
             'types' => ProjectType::cases(),
         ];
     }
@@ -235,7 +252,7 @@ class ProjectsBoard extends Page
         }
 
         return $query
-            ->with(['client', 'owner', 'requirements', 'materials', 'primaryDomain'])
+            ->with(['client', 'owner', 'salesRep', 'requirements', 'materials', 'primaryDomain'])
             ->withCount(['tasks', 'tasks as tasks_done_count' => fn (Builder $t) => $t->whereNotNull('completed_at')])
             ->tap(fn (Builder $q) => $this->applySort($q))
             ->get();
@@ -245,9 +262,21 @@ class ProjectsBoard extends Page
     {
         match ($this->sort) {
             'alfabetico' => $query->orderBy('name')->orderBy('id'),
+            'priorita' => $query->orderByRaw(self::priorityOrderSql())
+                ->orderByRaw('due_date is null')->orderBy('due_date')->orderBy('name'),
             'stato' => $query->orderByRaw(self::statusOrderSql())->orderBy('name'),
             default => $query->orderByRaw('due_date is null')->orderBy('due_date')->orderBy('name'),
         };
+    }
+
+    /** Most urgent first. */
+    private static function priorityOrderSql(): string
+    {
+        $cases = collect(ProjectPriority::cases())
+            ->map(fn (ProjectPriority $p) => "when priority = '{$p->value}' then {$p->rank()}")
+            ->implode(' ');
+
+        return "case {$cases} else 99 end";
     }
 
     /** Workflow order: the sito states first, then the modifica ones, as in the counters. */
@@ -272,6 +301,7 @@ class ProjectsBoard extends Page
     {
         return Project::query()
             ->when($this->owner, fn (Builder $q) => $q->where('owner_id', $this->owner))
+            ->when($this->salesRep, fn (Builder $q) => $q->where('sales_rep_id', $this->salesRep))
             ->when($this->type, fn (Builder $q) => $q->where('type', $this->type))
             ->when(trim($this->search) !== '', function (Builder $q) {
                 $term = '%'.trim($this->search).'%';

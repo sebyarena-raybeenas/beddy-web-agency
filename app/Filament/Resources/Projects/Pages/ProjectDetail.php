@@ -6,6 +6,7 @@ use App\Domain\Workflow\InvalidTransition;
 use App\Domain\Workflow\ProjectStatusService;
 use App\Enums\MaterialStatus;
 use App\Enums\PaymentStatus;
+use App\Enums\ProjectPriority;
 use App\Filament\Resources\Clients\ClientResource;
 use App\Filament\Resources\Projects\Actions\ChangeStatusAction;
 use App\Filament\Resources\Projects\ProjectResource;
@@ -90,6 +91,19 @@ class ProjectDetail extends Page
         ]);
 
         $this->notifyIfStatusChanged($before);
+    }
+
+    public function setPriority(string $priority): void
+    {
+        $new = ProjectPriority::tryFrom($priority);
+
+        if ($new === null) {
+            Notification::make()->title('Priorità non valida')->danger()->send();
+
+            return;
+        }
+
+        $this->project()->update(['priority' => $new]);
     }
 
     public function setPaymentStatus(string $status): void
@@ -181,7 +195,7 @@ class ProjectDetail extends Page
     {
         $project = $this->project();
         $project->load([
-            'client.contacts', 'owner', 'creator', 'members', 'primaryDomain',
+            'client.contacts', 'owner', 'salesRep', 'creator', 'members', 'primaryDomain',
             'requirements.doneBy',
             'materials.attachments', 'materials.requirement',
             'tasks.assignee', 'tasks.templateItem.template',
@@ -219,6 +233,7 @@ class ProjectDetail extends Page
             'timeline' => $project->timeline()->take(12)->map(fn ($entry) => $this->describe($entry, $project)),
             'materialStatuses' => MaterialStatus::cases(),
             'paymentStatuses' => PaymentStatus::cases(),
+            'priorities' => ProjectPriority::cases(),
             'paymentWarning' => $project->paymentWarning(),
             'clientUrl' => ClientResource::getUrl('edit', ['record' => $project->client]),
             'editUrl' => ProjectResource::getUrl('edit', ['record' => $project]),

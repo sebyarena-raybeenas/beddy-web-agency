@@ -76,3 +76,11 @@
 .pb-pay.pay-no { background: var(--redSoft); color: var(--red); }
 .pb-pay.pay-acc { background: var(--ambSoft); color: var(--amb); }
 .pb-pay.pay-ok { background: var(--grnSoft); color: var(--grn); }
+
+/* Priority pill on the board (Normale stays discreet). */
+.pb-prio { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; white-space: nowrap; }
+.pb-prio.prio-urgente { background: var(--redSoft); color: var(--red); }
+.pb-prio.prio-alta { background: var(--ambSoft); color: var(--amb); }
+.pb-prio.prio-normale { background: var(--grySoft); color: #5b6275; }
+.pb-prio.prio-bassa { background: var(--bluSoft); color: var(--blu); }
+.pb-prio-sel { font-size: 12px; padding: 3px 6px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); }

@@ -33,7 +33,14 @@
                     <option value="{{ $id }}">{{ $name }}</option>
                 @endforeach
             </select>
+            <select wire:model.live="salesRep" class="pb-input">
+                <option value="">Commerciale: tutti</option>
+                @foreach ($salesReps as $id => $name)
+                    <option value="{{ $id }}">{{ $name }}</option>
+                @endforeach
+            </select>
             <select wire:model.live="sort" class="pb-input" title="Ordina">
+                <option value="priorita">Ordina: priorità</option>
                 <option value="scadenza">Ordina: scadenza</option>
                 <option value="alfabetico">Ordina: nome (A-Z)</option>
                 <option value="stato">Ordina: stato</option>
@@ -74,6 +81,7 @@
                                     <span class="pb-meta">📅 {{ $p->due_date?->format('d/m/Y') ?? '—' }}</span>
                                 </div>
                                 <div class="pb-row" style="margin-top:6px">
+                                    <span class="pb-prio {{ $p->priority->pill() }}">{{ $p->priority->icon() }} {{ $p->priority->label() }}</span>
                                     <span class="pb-pay {{ $p->payment_status->pill() }}">💶 {{ $p->payment_status->label() }}</span>
                                 </div>
                             </a>
@@ -84,14 +92,21 @@
         @elseif ($viewMode === 'list')
             <div class="pb-card" style="overflow-x:auto">
                 <table class="pb-table">
-                    <tr><th>Progetto / cliente</th><th>Tipo</th><th>Stato</th><th>Requisiti</th><th>To-do</th><th>Responsabile</th><th>Scadenza</th><th>Pagamento</th><th>Avvisi</th></tr>
+                    <tr><th>Priorità</th><th>Progetto / cliente</th><th>Tipo</th><th>Stato</th><th>Requisiti</th><th>To-do</th><th>Responsabile</th><th>Scadenza</th><th>Pagamento</th><th>Avvisi</th></tr>
                     @forelse ($projects as $p)
                         @php
                             $overdue = $p->isOverdue();
                             $late = $p->hasLateMaterial();
                             $pct = $p->tasks_count > 0 ? (int) round($p->tasks_done_count / $p->tasks_count * 100) : 0;
                         @endphp
-                        <tr class="pb-tr">
+                        <tr class="pb-tr" wire:key="row-{{ $p->id }}">
+                            <td>
+                                <select class="pb-prio-sel {{ $p->priority->pill() }}" wire:change="setPriority({{ $p->id }}, $event.target.value)" title="Cambia priorità">
+                                    @foreach ($priorities as $pr)
+                                        <option value="{{ $pr->value }}" @selected($p->priority === $pr)>{{ $pr->icon() }} {{ $pr->label() }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
                             <td><a href="{{ $p->detailUrl() }}"><b>{{ $p->name }}</b><div class="pb-sub">{{ $p->client->name }}</div></a></td>
                             <td>{{ $p->type->label() }}</td>
                             <td><span class="pb-pill {{ ProjectsBoard::pill($p->status) }}">{{ $p->statusLabel() }}</span></td>
@@ -109,7 +124,7 @@
                             <td>@if ($late)<span class="pb-warn">materiale in ritardo</span>@else — @endif</td>
                         </tr>
                     @empty
-                        <tr><td colspan="9" class="pb-empty">Nessun progetto trovato.</td></tr>
+                        <tr><td colspan="10" class="pb-empty">Nessun progetto trovato.</td></tr>
                     @endforelse
                 </table>
             </div>

@@ -1,11 +1,13 @@
 <?php
 
+use App\Enums\ProjectPriority;
 use App\Filament\Pages\ProjectsBoard;
 use App\Models\Client;
 use App\Models\Domain;
 use App\Models\Material;
 use App\Models\Project;
 use App\Models\ProjectRequirement;
+use App\Models\SalesRep;
 use App\Models\Task;
 use App\Models\User;
 use Carbon\CarbonImmutable;
@@ -190,4 +192,32 @@ it('shows the payment status on the card', function () {
     boardProject('Hotel Rossi', 'Sito Rossi', ['payment_status' => 'acconto']);
 
     Livewire::test(ProjectsBoard::class)->assertSee('Acconto pagato')->assertSeeHtml('pay-acc');
+});
+
+it('sorts by priority, then by due date', function () {
+    boardProject('A', 'Normale vicino', ['priority' => 'normale', 'due_date' => today()->addDay()]);
+    boardProject('B', 'Urgente', ['priority' => 'urgente', 'due_date' => today()->addDays(20)]);
+    boardProject('C', 'Bassa', ['priority' => 'bassa', 'due_date' => today()]);
+    boardProject('D', 'Alta', ['priority' => 'alta']);
+    boardProject('E', 'Normale lontano', ['priority' => 'normale', 'due_date' => today()->addDays(5)]);
+
+    $names = collect(Livewire::test(ProjectsBoard::class)->set('sort', 'priorita')->viewData('projects'))->pluck('name')->all();
+
+    expect($names)->toBe(['Urgente', 'Alta', 'Normale vicino', 'Normale lontano', 'Bassa']);
+});
+
+it('filters by sales rep and changes priority from the list', function () {
+    $rep = SalesRep::factory()->create(['name' => 'Marco Venditore']);
+    $mine = boardProject('A', 'Del commerciale', ['sales_rep_id' => $rep->id]);
+    boardProject('B', 'Senza commerciale');
+
+    Livewire::test(ProjectsBoard::class)
+        ->set('salesRep', $rep->id)
+        ->assertSee('Del commerciale')
+        ->assertDontSee('Senza commerciale')
+        ->set('viewMode', 'list')
+        ->call('setPriority', $mine->id, 'urgente')
+        ->call('setPriority', $mine->id, 'inventata');
+
+    expect($mine->fresh()->priority)->toBe(ProjectPriority::Urgente);
 });
