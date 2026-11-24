@@ -10,6 +10,8 @@ class ListInternalActivities extends ListRecords
 {
     protected static string $resource = InternalActivityResource::class;
 
+    protected static ?string $title = 'Attività interne';
+
     protected function getHeaderActions(): array
     {
         return [CreateAction::make()->label('Nuova attività')];

@@ -10,6 +10,8 @@ class EditInternalActivity extends EditRecord
 {
     protected static string $resource = InternalActivityResource::class;
 
+    protected static ?string $title = 'Modifica attività interna';
+
     protected function getHeaderActions(): array
     {
         return [DeleteAction::make()];

@@ -9,6 +9,8 @@ class CreateInternalActivity extends CreateRecord
 {
     protected static string $resource = InternalActivityResource::class;
 
+    protected static ?string $title = 'Nuova attività interna';
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['created_by'] = auth()->id();
