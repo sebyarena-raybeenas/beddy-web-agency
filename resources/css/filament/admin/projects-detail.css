@@ -110,3 +110,11 @@
 .pd-pay button.on.prio-alta { background: var(--ambSoft); color: var(--amb); border-color: var(--amb); }
 .pd-pay button.on.prio-normale { background: var(--grySoft); color: #5b6275; border-color: var(--gry); }
 .pd-pay button.on.prio-bassa { background: var(--bluSoft); color: var(--blu); border-color: var(--blu); }
+
+/* Internal activity detail. */
+.ad-meta { grid-template-columns: repeat(3, 1fr); }
+.ad-done h2 { color: var(--mute); }
+.ad-desc { font-size: 13.5px; line-height: 1.6; color: var(--ink); white-space: normal; }
+.ad-del { border: 0; background: none; color: var(--mute); cursor: pointer; font-size: 13px; padding: 2px 6px; border-radius: 6px; }
+.ad-del:hover { background: var(--redSoft); color: var(--red); }
+@media (max-width: 900px) { .ad-meta { grid-template-columns: 1fr 1fr; } }
