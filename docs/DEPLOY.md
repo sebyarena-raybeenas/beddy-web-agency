@@ -115,7 +115,7 @@ Dopo ogni modifica al `.env` rilancia `php artisan optimize:clear && php artisan
 
 ## 9. Scheduler (promemoria giornalieri)
 
-I promemoria (`beddy:reminders`) partono ogni giorno alle 09:00 (Europe/Rome) tramite lo scheduler di Laravel. Aggiungi **una sola** riga al crontab dell'utente di deploy (`crontab -e`):
+I promemoria (`beddy:reminders`) partono ogni giorno alle 09:00 (Europe/Rome) tramite lo scheduler di Laravel. Riguardano i progetti (stato «Pronto…», scadenze, materiale in ritardo) e le attività interne aperte con responsabile, da 2 giorni prima della scadenza finché non vengono completate; al massimo uno al giorno per progetto o attività. Aggiungi **una sola** riga al crontab dell'utente di deploy (`crontab -e`):
 
 ```cron
 * * * * * cd <percorso-app> && php artisan schedule:run >> /dev/null 2>&1

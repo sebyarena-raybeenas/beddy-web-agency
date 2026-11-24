@@ -3,9 +3,11 @@
 use App\Domain\Reminders\ReminderService;
 use App\Domain\Workflow\ProjectStatusService;
 use App\Enums\MaterialKind;
+use App\Models\InternalActivity;
 use App\Models\Material;
 use App\Models\Project;
 use App\Models\User;
+use App\Notifications\ActivityDeadlineReminder;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Carbon;
@@ -121,4 +123,46 @@ it('runs from the command and prints the count', function () {
     ownedProject('pronto_da_sviluppare');
 
     $this->artisan('beddy:reminders')->expectsOutput('Promemoria inviati: 1')->assertSuccessful();
+});
+
+function ownedActivity(string $due, array $attrs = []): InternalActivity
+{
+    return InternalActivity::factory()->create(array_merge([
+        'name' => 'Aggiornamento server',
+        'owner_id' => User::factory()->create()->id,
+        'due_date' => $due,
+    ], $attrs));
+}
+
+it('reminds the owner of an internal activity from 2 days before, every day, once a day', function () {
+    $activity = ownedActivity('2026-12-10');
+
+    expect(runReminders('2026-12-07'))->toBe(0)
+        ->and(runReminders('2026-12-08'))->toBe(1)
+        ->and(runReminders('2026-12-08'))->toBe(0)
+        ->and(runReminders('2026-12-10'))->toBe(1)
+        ->and(runReminders('2026-12-15'))->toBe(1);
+
+    $last = $activity->owner->notifications()->latest('created_at')->first();
+    expect($last->type)->toBe(ActivityDeadlineReminder::class)
+        ->and($last->data['internal_activity_id'])->toBe($activity->id)
+        ->and($last->data['body'])->toContain('scaduta da 5 giorni');
+});
+
+it('words the activity reminder by days left', function () {
+    $activity = ownedActivity('2026-12-10');
+    $message = fn (string $date) => (new ActivityDeadlineReminder($activity, CarbonImmutable::parse($date)))->message();
+
+    expect($message('2026-12-08'))->toContain('scade tra 2 giorni')
+        ->and($message('2026-12-09'))->toContain('scade domani')
+        ->and($message('2026-12-10'))->toContain('scade oggi')
+        ->and($message('2026-12-11'))->toContain('scaduta da 1 giorno');
+});
+
+it('skips completed activities, activities without owner or without due date', function () {
+    ownedActivity('2026-12-10', ['completed_at' => now()]);
+    ownedActivity('2026-12-10', ['owner_id' => null]);
+    ownedActivity('2026-12-10', ['due_date' => null]);
+
+    expect(runReminders('2026-12-12'))->toBe(0);
 });
